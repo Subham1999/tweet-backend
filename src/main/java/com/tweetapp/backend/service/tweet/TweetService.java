@@ -24,8 +24,6 @@ public interface TweetService {
 
     CreateTweetResponse createTweet(final CreateTweetRequest createTweetRequest);
 
-    ViewTweetResponse viewTweet(final ViewTweetRequest viewTweetRequest);
-
     UpdateTweetResponse updateTweet(final UpdateTweetRequest updateTweetRequest);
 
     DeleteTweetResponse deleteTweet(final DeleteTweetRequest deleteTweetRequest);

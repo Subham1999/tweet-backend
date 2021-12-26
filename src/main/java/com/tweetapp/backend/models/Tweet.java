@@ -18,6 +18,7 @@ public class Tweet {
     @Id
     private String id;
     private String content;
+    private String createdBy;
     private Date createdAt;
     private LinkedList<Like> likes;
     private LinkedList<Reply> replies;

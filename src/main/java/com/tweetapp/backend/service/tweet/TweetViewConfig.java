@@ -1,12 +1,14 @@
 package com.tweetapp.backend.service.tweet;
 
-import java.util.List;
+import java.util.Map;
+
+import org.springframework.data.domain.Pageable;
 
 public interface TweetViewConfig {
 
-    List<String> getAutherNames();
+    TweetFetchType fetchType();
 
-    boolean sorted();
+    Map<TweetViewConfigConstant, Object> getConfigMap();
 
-    List<SortingParam> getSortingOrders();
+    Pageable getPageRequest();
 }

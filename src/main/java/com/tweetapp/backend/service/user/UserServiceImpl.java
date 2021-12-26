@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,6 +221,11 @@ public class UserServiceImpl implements UserService {
 			    ._status_code(STATUS_SUCCESS)._message(NO_USER_FOUND_WITH_THIS_EMAIL).build();
 	    }
 	}
+    }
+
+    @Override
+    public boolean userExists(@NotNull String email) {
+	return userRepository.existsById(email);
     }
 
 }
