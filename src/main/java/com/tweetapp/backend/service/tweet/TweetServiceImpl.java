@@ -57,7 +57,7 @@ public class TweetServiceImpl implements TweetService {
 		    .createdBy(savedTweet.getCreatedBy()).id(savedTweet.getId()).build();
 
 	} else {
-	    return CreateTweetResponse.builder()._status_code(1)
+	    return CreateTweetResponse.builder()._status_code(0)
 		    ._message("Author email id : " + createdByEmail + " is absent or misspelled").build();
 	}
 

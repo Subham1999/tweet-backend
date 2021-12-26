@@ -1,6 +1,9 @@
 package com.tweetapp.backend.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -52,13 +55,13 @@ public class RestTweetController {
     }
 
     @GetMapping("/search")
-    public Page<Tweet> searchTweets(
-	    @RequestParam(required = false) String createdBy, 
+    public Page<Tweet> searchTweets(@RequestParam(required = false) String createdBy,
 	    @RequestParam(required = false, defaultValue = "globalFeed") String fetchType,
 	    @RequestParam(required = false, defaultValue = "0") Integer pageOffset,
-	    @RequestParam(required = false, defaultValue = "10") Integer pageLength) {
+	    @RequestParam(required = false, defaultValue = "10") Integer pageLength,
+	    @RequestParam(required = false, defaultValue = "createdAt_DESCENDING") String[] sortBy) {
 	TweetFetchType tweetFetchType;
-	
+
 	System.out.println("Created by : " + createdBy);
 
 	if (StringUtils.equalsIgnoreCase(fetchType, "globalfeed")) {
@@ -81,7 +84,16 @@ public class RestTweetController {
 
 	    @Override
 	    public Pageable getPageRequest() {
-		PageRequest pageRequest = PageRequest.of(pageOffset, pageLength, Sort.by(Order.desc("createdAt")));
+		final List<Order> orders = new ArrayList<>();
+		for (final String sortByParam : sortBy) {
+		    if (sortByParam.endsWith("_DESCENDING")) {
+			orders.add(Order.desc(sortByParam.split("_DESCENDING")[0]));
+		    } else {
+			orders.add(Order.asc(sortByParam));
+		    }
+		}
+		System.out.println(orders);
+		final PageRequest pageRequest = PageRequest.of(pageOffset, pageLength, Sort.by(orders));
 		return pageRequest;
 	    }
 
