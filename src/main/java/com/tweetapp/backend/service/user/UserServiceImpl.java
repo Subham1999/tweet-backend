@@ -86,6 +86,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
+	// 'null' check
 	if (Objects.isNull(createUserRequest)) {
 	    return CreateUserResponse.builder()
 		    ._status_code(STATUS_FAILED)
@@ -93,9 +94,19 @@ public class UserServiceImpl implements UserService {
 		    .build();
 	}
 	
+	// Check whether 'email' already exists or not
+	final String email = createUserRequest.getEmail();
+	if (userExists(email)) {
+	    return  CreateUserResponse.builder()
+    	    	._status_code(STATUS_FAILED)
+    	    	._message(USER_RECORD_CANNOT_BE_CREATED + " email already exists!")
+    	    	.build();
+	}
+	
+	// Create a user
 	final Date CURRENT_DATE = new Date();
 	final User user = User.builder()
-		.dateOfJoin(CURRENT_DATE)
+		.dateOfJoin((createUserRequest.getDateOfJoin() == null) ? CURRENT_DATE : createUserRequest.getDateOfJoin())
 		.firstName(createUserRequest.getFirstName())
 		.lastName(createUserRequest.getLastName())
 		.email(createUserRequest.getEmail())
@@ -144,7 +155,7 @@ public class UserServiceImpl implements UserService {
 	
 	final Optional<User> foundByEmail = userRepository.findByEmail(email);
 	
-	if (foundByEmail.isPresent()) {
+	if (foundByEmail.isPresent()) { // When 'email' present -- then can update
 	    final User user = foundByEmail.get();
 	    
 	    if (Objects.nonNull(updateUserRequest.getFirstName())) {
@@ -176,7 +187,7 @@ public class UserServiceImpl implements UserService {
 			.email(email)
 			.build();
 	    }
-	} else {
+	} else { // When 'email' is not present -- cannot update!
 	    return UpdateUserResponse.builder()
 			._status_code(STATUS_FAILED)
 			._message(NO_USER_FOUND_WITH_THIS_EMAIL)

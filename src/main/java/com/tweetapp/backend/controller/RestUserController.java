@@ -1,30 +1,41 @@
 package com.tweetapp.backend.controller;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tweetapp.backend.commons.MyPasswordEncoder;
+import com.tweetapp.backend.dao.user.SecretRepository;
 import com.tweetapp.backend.dto.user.CreateUserRequest;
 import com.tweetapp.backend.dto.user.CreateUserResponse;
 import com.tweetapp.backend.dto.user.UpdateUserRequest;
 import com.tweetapp.backend.dto.user.UpdateUserResponse;
 import com.tweetapp.backend.dto.user.ViewUserRequest;
 import com.tweetapp.backend.dto.user.ViewUserResponse;
-import com.tweetapp.backend.dto.user.auth.LoginRequest;
-import com.tweetapp.backend.dto.user.auth.LoginResponse;
+import com.tweetapp.backend.models.ForgotPasswordAnswer;
 import com.tweetapp.backend.service.user.UserService;
 
 @RestController
 @RequestMapping(path = Urls.USER_BASE)
-public class RestUserController implements UserController {
+public class RestUserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MyPasswordEncoder myPasswordEncoder;
+
+    @Autowired
+    private SecretRepository secretRepository;
 
     private static final String SERVER_CONDITION_GOOD = "SERVER IS UP AND RUNNING";
 
@@ -34,27 +45,58 @@ public class RestUserController implements UserController {
     }
 
     @RequestMapping(path = "/search/{email}", method = RequestMethod.GET)
-    @Override
     public ViewUserResponse viewUser(@PathVariable @Email String email) {
 	return userService.viewUser(ViewUserRequest.builder().mail(email).build());
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    @Override
-    public CreateUserResponse createUser(@RequestBody CreateUserRequest createUserRequest) {
-	return userService.createUser(createUserRequest);
+    public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
+	CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
+	if (createUserResponse.get_status_code() == 0) {
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createUserResponse);
+	} else {
+	    return ResponseEntity.status(HttpStatus.OK).body(createUserResponse);
+	}
     }
 
     @RequestMapping(path = "/{email}", method = RequestMethod.PUT)
-    @Override
-    public UpdateUserResponse updateUser(@PathVariable String email, @RequestBody UpdateUserRequest updateUserRequest) {
-	updateUserRequest.setEmail(email);
-	return userService.updateUser(updateUserRequest);
+    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String email,
+	    @RequestBody UpdateUserRequest updateUserRequest) {
+	if (email.equals(updateUserRequest.getEmail())) {
+	    UpdateUserResponse updateUser = userService.updateUser(updateUserRequest);
+	    if (updateUser.get_status_code() == 0) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updateUser);
+	    } else {
+		return ResponseEntity.status(HttpStatus.OK).body(updateUser);
+	    }
+	} else {
+	    return null;
+	}
     }
 
-    @Override
-    public LoginResponse attemptLogin(@RequestBody LoginRequest loginRequest) {
-	return userService.attemptLogin(loginRequest);
+//	--- COMENTED OUT BECAUSE A SEPARATE AUTHENTICATION MICROSERVICE CAN BE CREATED
+//    public LoginResponse attemptLogin(@RequestBody @Valid LoginRequest loginRequest) {
+//	return userService.attemptLogin(loginRequest);
+//    }
+
+    @PostMapping("/secret_share")
+    public ResponseEntity<?> storeSecrets(@RequestBody @Valid ForgotPasswordAnswer forgotPasswordAnswer) {
+
+	String userEmail = forgotPasswordAnswer.getUserEmail();
+
+	if (userService.userExists(userEmail)) {
+	    try {
+		String answer = forgotPasswordAnswer.getAnswer();
+		answer = myPasswordEncoder.encode(answer);
+		forgotPasswordAnswer.setAnswer(answer);
+		secretRepository.save(forgotPasswordAnswer);
+		return ResponseEntity.ok("Secret stored");
+	    } catch (Exception e) {
+		return ResponseEntity.internalServerError().body(e.getMessage());
+	    }
+	} else {
+	    return ResponseEntity.badRequest().body("user email " + userEmail + " is not associated with any user");
+	}
     }
 
 }
