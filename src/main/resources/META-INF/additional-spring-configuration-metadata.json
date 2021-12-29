@@ -1,9 +1,57 @@
-{
-	"properties": [
-		{
-			"name": "forgot_password_question",
-			"type": "java.lang.String",
-			"description": "A description for 'forgot_password_question'"
-		}
-	]
-}
+{"properties": [
+  {
+    "name": "forgot_password_question",
+    "type": "java.lang.String",
+    "description": "A description for 'forgot_password_question'"
+  },
+  {
+    "name": "swagger_api_doc.group_name",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.group_name'"
+  },
+  {
+    "name": "swagger_api_doc.title",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.title'"
+  },
+  {
+    "name": "swagger_api_doc.api_regex",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.api_regex'"
+  },
+  {
+    "name": "swagger_api_doc.description",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.description'"
+  },
+  {
+    "name": "swagger_api_doc.contact_name",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.contact_name'"
+  },
+  {
+    "name": "swagger_api_doc.contact_url",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.contact_url'"
+  },
+  {
+    "name": "swagger_api_doc.contact_email",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.contact_email'"
+  },
+  {
+    "name": "swagger_api_doc.license",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.license'"
+  },
+  {
+    "name": "swagger_api_doc.license_url",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.license_url'"
+  },
+  {
+    "name": "swagger_api_doc.version",
+    "type": "java.lang.String",
+    "description": "A description for 'swagger_api_doc.version'"
+  }
+]}

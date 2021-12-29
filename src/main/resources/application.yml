@@ -10,3 +10,14 @@ spring:
     mongodb:
       uri: ${NOSQL_DB_PROTO:mongodb}:${CRED_DETAILS:}//${DB_HOST:localhost}:${DB_PORT:27017}/${DB_NAME:test}?${DB_CONN_PARAMS:}
   
+swagger_api_doc:
+  group_name: Tweet App public API
+  title: Tweet API
+  api_regex: /api/v1.0.*
+  description: Tweet Application API reference for UI/UX developer
+  contact_name: Subham Santra
+  contact_url:
+  contact_email: subham.santra@cognizant.com
+  license: FSE1 Acreditation license
+  license_url: subham_santra@dummy_license.com
+  version: v1.0
