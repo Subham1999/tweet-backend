@@ -1,5 +1,10 @@
 package com.tweetapp.backend.dto.tweet.like;
 
-public class DeleteLikeResponse {
+import com.tweetapp.backend.dto.Response;
+
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
+public class DeleteLikeResponse extends Response {
 
 }

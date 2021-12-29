@@ -14,8 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tweetapp.backend.dto.tweet.CreateTweetRequest;
 import com.tweetapp.backend.dto.tweet.CreateTweetResponse;
+import com.tweetapp.backend.dto.tweet.like.DeleteLikeRequest;
+import com.tweetapp.backend.dto.tweet.like.DeleteLikeResponse;
+import com.tweetapp.backend.dto.tweet.like.LikeTweetRequest;
+import com.tweetapp.backend.dto.tweet.like.LikeTweetResponse;
 import com.tweetapp.backend.dto.tweet.reply.ReplyTweetRequest;
 import com.tweetapp.backend.dto.tweet.reply.ReplyTweetResponse;
 import com.tweetapp.backend.models.Tweet;
@@ -47,15 +51,8 @@ public class RestTweetController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateTweetResponse> postNewTweet(@RequestBody CreateTweetRequest createTweetRequest) {
-
-	CreateTweetResponse createTweetResponse = tweetService.createTweet(createTweetRequest);
-
-	if (createTweetResponse.get_status_code() == 0) {
-	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createTweetResponse);
-	} else {
-	    return ResponseEntity.ok(createTweetResponse);
-	}
+    public CreateTweetResponse postNewTweet(@RequestBody CreateTweetRequest createTweetRequest) {
+	return tweetService.createTweet(createTweetRequest);
     }
 
     @GetMapping("/search")
@@ -122,6 +119,16 @@ public class RestTweetController {
     public ResponseEntity<Object> replyOnPost(@RequestBody @Valid ReplyTweetRequest replyTweetRequest) {
 	ReplyTweetResponse replyTweetResponse = tweetService.replyOnTweet(replyTweetRequest);
 	return ResponseEntity.ok(replyTweetResponse);
+    }
+
+    @PostMapping("/like")
+    public LikeTweetResponse likeOnPost(@RequestBody @Valid LikeTweetRequest likeTweetRequest) {
+	return tweetService.likeOnTweet(likeTweetRequest);
+    }
+
+    @DeleteMapping("/dislike")
+    public DeleteLikeResponse dislikeOnPost(@RequestBody @Valid DeleteLikeRequest deleteLikeRequest) {
+	return tweetService.deleteLikeOnTweet(deleteLikeRequest);
     }
 
 }
