@@ -1,5 +1,8 @@
 package com.tweetapp.backend.controller;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
@@ -38,6 +41,13 @@ public class RestUserController {
     private SecretRepository secretRepository;
 
     private static final String SERVER_CONDITION_GOOD = "SERVER IS UP AND RUNNING";
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+	    Pattern.CASE_INSENSITIVE);
+
+    private boolean isValidEmail(String emailStr) {
+	Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
+	return matcher.find();
+    }
 
     @RequestMapping(path = Urls.HEALTH_CHECK, method = RequestMethod.GET)
     public HealthCheckResponse healthCheck() {
@@ -60,17 +70,20 @@ public class RestUserController {
     }
 
     @RequestMapping(path = "/{email}", method = RequestMethod.PUT)
-    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String email,
+    public ResponseEntity<Object> updateUser(@PathVariable(required = true) String email,
 	    @RequestBody UpdateUserRequest updateUserRequest) {
-	if (email.equals(updateUserRequest.getEmail())) {
-	    UpdateUserResponse updateUser = userService.updateUser(updateUserRequest);
-	    if (updateUser.get_status_code() == 0) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updateUser);
-	    } else {
-		return ResponseEntity.status(HttpStatus.OK).body(updateUser);
-	    }
+
+	if (!isValidEmail(email)) {
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid email id provided : " + email);
+	}
+
+	updateUserRequest.setEmail(email);
+
+	UpdateUserResponse updateUser = userService.updateUser(updateUserRequest);
+	if (updateUser.get_status_code() == 0) {
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updateUser);
 	} else {
-	    return null;
+	    return ResponseEntity.status(HttpStatus.OK).body(updateUser);
 	}
     }
 

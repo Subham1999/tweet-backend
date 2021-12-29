@@ -8,8 +8,6 @@ import com.tweetapp.backend.dto.tweet.DeleteTweetRequest;
 import com.tweetapp.backend.dto.tweet.DeleteTweetResponse;
 import com.tweetapp.backend.dto.tweet.UpdateTweetRequest;
 import com.tweetapp.backend.dto.tweet.UpdateTweetResponse;
-import com.tweetapp.backend.dto.tweet.ViewTweetRequest;
-import com.tweetapp.backend.dto.tweet.ViewTweetResponse;
 import com.tweetapp.backend.dto.tweet.like.DeleteLikeRequest;
 import com.tweetapp.backend.dto.tweet.like.DeleteLikeResponse;
 import com.tweetapp.backend.dto.tweet.like.LikeTweetRequest;
@@ -37,4 +35,6 @@ public interface TweetService {
     DeleteReplyResponse deleteReplyOnTweet(final DeleteReplyRequest deleteReplyRequest);
 
     Page<Tweet> viewTweets(final TweetViewConfig tweetViewConfig);
+
+    Tweet getOne(String tweet_id);
 }

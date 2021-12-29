@@ -1,5 +1,11 @@
 package com.tweetapp.backend.dto.tweet.reply;
 
-public class ReplyTweetResponse {
+import com.tweetapp.backend.dto.Response;
 
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@SuperBuilder
+public class ReplyTweetResponse extends Response {
 }

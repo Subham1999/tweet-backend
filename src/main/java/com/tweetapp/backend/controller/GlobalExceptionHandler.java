@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.tweetapp.backend.exceptions.InvalidRequest;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,5 +23,21 @@ public class GlobalExceptionHandler {
 	
 	
 	return ResponseEntity.status(465).body(map);
+    }
+    
+    @ExceptionHandler(InvalidRequest.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidRequest(final InvalidRequest exception) {
+	String message = exception.getMessage();
+	Map<String,Object> map = Map.of("err-message", message);
+	
+	return ResponseEntity.status(465).body(map);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Map<String, Object>> handleNullPointerException(final NullPointerException exception) {
+	String message = exception.getMessage();
+	Map<String,Object> map = Map.of("err-message", message);
+	
+	return ResponseEntity.status(466).body(map);
     }
 }

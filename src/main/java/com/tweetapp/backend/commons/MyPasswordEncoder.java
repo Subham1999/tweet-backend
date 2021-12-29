@@ -7,6 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MyPasswordEncoder {
 
+    /**
+     * Nothing fancy here!!
+     * Will Update with a concrete hash technique
+     * 
+     * @param actual
+     * @return
+     */
     public String encode(String actual) {
 	if (actual == null)
 	    return null;

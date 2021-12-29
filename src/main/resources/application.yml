@@ -1,0 +1,12 @@
+forgot_password_question: Write your date of birth followed by any 3 digits. (E.g. yyyyMMddxxx 20050203523)
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api/v1.0
+
+spring:
+  data:
+    mongodb:
+      uri: ${NOSQL_DB_PROTO:mongodb}:${CRED_DETAILS:}//${DB_HOST:localhost}:${DB_PORT:27017}/${DB_NAME:test}?${DB_CONN_PARAMS:}
+  

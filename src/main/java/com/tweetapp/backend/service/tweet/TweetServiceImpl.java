@@ -3,6 +3,8 @@ package com.tweetapp.backend.service.tweet;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,8 @@ import com.tweetapp.backend.dto.tweet.reply.DeleteReplyRequest;
 import com.tweetapp.backend.dto.tweet.reply.DeleteReplyResponse;
 import com.tweetapp.backend.dto.tweet.reply.ReplyTweetRequest;
 import com.tweetapp.backend.dto.tweet.reply.ReplyTweetResponse;
+import com.tweetapp.backend.exceptions.InvalidRequest;
+import com.tweetapp.backend.models.Reply;
 import com.tweetapp.backend.models.Tweet;
 import com.tweetapp.backend.service.user.UserService;
 
@@ -85,7 +89,35 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public ReplyTweetResponse replyOnTweet(ReplyTweetRequest replyTweetRequest) {
-	return null;
+	Objects.requireNonNull(replyTweetRequest);
+
+	String postId = replyTweetRequest.getPostId();
+	if (!tweetExists(postId)) {
+	    throw new InvalidRequest("Post Id : " + postId + " doesn't exists");
+	}
+
+	String repliedBy = replyTweetRequest.getRepliedBy();
+
+	if (!userExists(repliedBy)) {
+	    throw new InvalidRequest("No user with email : " + repliedBy + " exist");
+	}
+
+	Tweet tweet = tweetRepository.findById(postId).get();
+
+	tweet.getReplies().add(Reply.builder().repliedBy(repliedBy).content(replyTweetRequest.getReply())
+		.repliedDate(replyTweetRequest.getRepliedDate()).build());
+
+	tweetRepository.save(tweet);
+
+	return ReplyTweetResponse.builder()._status_code(1)._message("reply saved successfully").build();
+    }
+
+    private boolean userExists(String repliedBy) {
+	return userService.userExists(repliedBy);
+    }
+
+    private boolean tweetExists(String postId) {
+	return tweetRepository.existsById(postId);
     }
 
     @Override
@@ -111,6 +143,16 @@ public class TweetServiceImpl implements TweetService {
 	} else {
 	    return null;
 	}
+    }
+
+    @Override
+    public Tweet getOne(String tweet_id) {
+	Optional<Tweet> optional = tweetRepository.findById(tweet_id);
+	if (optional.isEmpty()) {
+	    throw new InvalidRequest("Tweet ID doesn't exist : " + tweet_id);
+	}
+
+	return optional.get();
     }
 
 }

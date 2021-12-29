@@ -1,0 +1,9 @@
+{
+	"properties": [
+		{
+			"name": "forgot_password_question",
+			"type": "java.lang.String",
+			"description": "A description for 'forgot_password_question'"
+		}
+	]
+}

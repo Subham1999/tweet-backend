@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tweetapp.backend.dto.tweet.CreateTweetRequest;
 import com.tweetapp.backend.dto.tweet.CreateTweetResponse;
+import com.tweetapp.backend.dto.tweet.reply.ReplyTweetRequest;
+import com.tweetapp.backend.dto.tweet.reply.ReplyTweetResponse;
 import com.tweetapp.backend.models.Tweet;
 import com.tweetapp.backend.service.tweet.TweetFetchType;
 import com.tweetapp.backend.service.tweet.TweetService;
@@ -106,6 +111,17 @@ public class RestTweetController {
 		return tweetFetchType;
 	    }
 	});
+    }
+
+    @GetMapping("/{tweet_id}")
+    public Tweet getOne(@PathVariable String tweet_id) {
+	return tweetService.getOne(tweet_id);
+    }
+
+    @PostMapping("/reply")
+    public ResponseEntity<Object> replyOnPost(@RequestBody @Valid ReplyTweetRequest replyTweetRequest) {
+	ReplyTweetResponse replyTweetResponse = tweetService.replyOnTweet(replyTweetRequest);
+	return ResponseEntity.ok(replyTweetResponse);
     }
 
 }
