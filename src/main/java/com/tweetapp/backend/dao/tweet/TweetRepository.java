@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import com.tweetapp.backend.models.Tweet;
 
 public interface TweetRepository extends MongoRepository<Tweet, String> {
-    
+
     @Query(value = "{'createdBy' : ?0}")
     Page<Tweet> findAllOrderByCreatedAtDesc(String createdBy, Pageable pageable);
 }

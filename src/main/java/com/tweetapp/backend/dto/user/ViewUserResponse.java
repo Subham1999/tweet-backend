@@ -21,7 +21,8 @@ public class ViewUserResponse {
     private String firstName;
     private String lastName;
     private String email;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfJoin;
+    private boolean isSecretShared;
 }

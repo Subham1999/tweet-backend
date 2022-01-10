@@ -53,8 +53,7 @@ public class TweetServiceImpl implements TweetService {
 	if (userService.userExists(createdByEmail)) {
 
 	    final Tweet tweet = Tweet.builder().createdBy(createTweetRequest.getCreatedBy())
-		    .content(createTweetRequest.getContent()).createdAt(new Date())
-		    .likes(new LinkedHashSet<>())
+		    .content(createTweetRequest.getContent()).createdAt(new Date()).likes(new LinkedHashSet<>())
 		    .replies(new LinkedList<>()).build();
 
 	    final Tweet savedTweet = tweetRepository.save(tweet);
@@ -83,7 +82,7 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public LikeTweetResponse likeOnTweet(LikeTweetRequest likeTweetRequest) {
 	Objects.requireNonNull(likeTweetRequest);
-	
+
 	String postId = likeTweetRequest.getPostId();
 	String likedBy = likeTweetRequest.getLikerId();
 
@@ -93,15 +92,11 @@ public class TweetServiceImpl implements TweetService {
 	if (!userExists(likedBy)) {
 	    throw new InvalidRequest("No user with email : " + likedBy + " exist");
 	}
-	
+
 	final Tweet tweet = tweetRepository.findById(postId).get();
 	Date likedDate = likeTweetRequest.getLikedDate();
 	tweet.getLikes().add(
-		Like.builder()
-			.likedDate(Objects.isNull(likedDate) ? new Date() : likedDate)
-			.likerId(likedBy)
-			.build()
-	);
+		Like.builder().likedDate(Objects.isNull(likedDate) ? new Date() : likedDate).likerId(likedBy).build());
 	tweetRepository.save(tweet);
 	return LikeTweetResponse.builder()._status_code(1)._message("Liked successfully").build();
     }
@@ -111,25 +106,25 @@ public class TweetServiceImpl implements TweetService {
 	Objects.requireNonNull(deleteLikeRequest);
 	final String postId = deleteLikeRequest.getPostId();
 	final String likedBy = deleteLikeRequest.getLikedBy();
-	
+
 	if (!tweetExists(postId)) {
 	    throw new InvalidRequest("Post Id : " + postId + " doesn't exists");
 	}
 	if (!userExists(likedBy)) {
 	    throw new InvalidRequest("No user with email : " + likedBy + " exist");
 	}
-	
+
 	final Like like = Like.builder().likerId(likedBy).likedDate(null).build();
 	final Tweet tweet = tweetRepository.findById(postId).get();
 	final LinkedHashSet<Like> likes = tweet.getLikes();
-	
+
 	if (likes.contains(like)) {
 	    likes.remove(like);
 	    tweetRepository.save(tweet);
 	} else {
 	    // Nothing TODO
 	}
-	
+
 	return DeleteLikeResponse.builder()._status_code(1).build();
     }
 

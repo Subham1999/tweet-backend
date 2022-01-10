@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.tweetapp.backend.exceptions.InternalServerException;
 import com.tweetapp.backend.exceptions.InvalidRequest;
+import com.tweetapp.backend.exceptions.PasswordMismatchException;
+
+import io.jsonwebtoken.ExpiredJwtException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,12 +37,13 @@ public class GlobalExceptionHandler {
 //	return ResponseEntity.status(465).body(map);
 //    }
 //    
-    @ExceptionHandler(value = { InternalServerException.class, InvalidRequest.class })
+    @ExceptionHandler(value = { HttpMessageNotReadableException.class, PasswordMismatchException.class,
+	    ExpiredJwtException.class, InternalServerException.class, InvalidRequest.class })
     public ResponseEntity<Map<String, Object>> handleApplicationRuntimeExceptions(final RuntimeException exception) {
 	String message = exception.getMessage();
 	Map<String, Object> map = Map.of("err-message", message);
 
-	return ResponseEntity.status(450).body(map);
+	return ResponseEntity.status(452).body(map);
     }
 
     @ExceptionHandler(NullPointerException.class)

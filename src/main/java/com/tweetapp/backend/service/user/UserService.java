@@ -18,6 +18,6 @@ public interface UserService {
     UpdateUserResponse updateUser(UpdateUserRequest updateUserRequest);
 
     LoginResponse attemptLogin(LoginRequest loginRequest);
-    
+
     boolean userExists(String email);
 }

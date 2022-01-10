@@ -45,7 +45,7 @@ public class RestTweetController {
     @Autowired
     private TweetService tweetService;
 
-    @GetMapping
+    @GetMapping("/hello")
     public String hello() {
 	return "Hello";
     }

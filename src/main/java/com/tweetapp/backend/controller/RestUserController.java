@@ -9,6 +9,7 @@ import javax.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tweetapp.backend.commons.MyPasswordEncoder;
-import com.tweetapp.backend.dao.user.SecretRepository;
+import com.tweetapp.backend.dao.secrets.ProfileSecretRepository;
 import com.tweetapp.backend.dto.user.CreateUserRequest;
 import com.tweetapp.backend.dto.user.CreateUserResponse;
 import com.tweetapp.backend.dto.user.UpdateUserRequest;
@@ -35,10 +35,10 @@ public class RestUserController {
     private UserService userService;
 
     @Autowired
-    private MyPasswordEncoder myPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private SecretRepository secretRepository;
+    private ProfileSecretRepository secretRepository;
 
     private static final String SERVER_CONDITION_GOOD = "SERVER IS UP AND RUNNING";
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
@@ -87,7 +87,7 @@ public class RestUserController {
 	}
     }
 
-//	--- COMENTED OUT BECAUSE A SEPARATE AUTHENTICATION MICROSERVICE CAN BE CREATED
+//	--- COMENTED OUT BECAUSE A SEPARATE AUTHENTICATION CONTROLLER CAN BE CREATED
 //    public LoginResponse attemptLogin(@RequestBody @Valid LoginRequest loginRequest) {
 //	return userService.attemptLogin(loginRequest);
 //    }
@@ -100,7 +100,7 @@ public class RestUserController {
 	if (userService.userExists(userEmail)) {
 	    try {
 		String answer = forgotPasswordAnswer.getAnswer();
-		answer = myPasswordEncoder.encode(answer);
+		answer = passwordEncoder.encode(answer);
 		forgotPasswordAnswer.setAnswer(answer);
 		secretRepository.save(forgotPasswordAnswer);
 		return ResponseEntity.ok("Secret stored");

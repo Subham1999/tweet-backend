@@ -9,7 +9,7 @@ import lombok.Data;
 public class DeleteLikeRequest {
     @NotBlank
     private String postId;
-    
+
     @NotBlank
     @Email
     private String likedBy;

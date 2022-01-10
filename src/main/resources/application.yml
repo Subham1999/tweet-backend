@@ -21,3 +21,5 @@ swagger_api_doc:
   license: FSE1 Acreditation license
   license_url: subham_santra@dummy_license.com
   version: v1.0
+  
+jwt.lifetime: 1800000

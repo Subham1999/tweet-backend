@@ -3,7 +3,6 @@ package com.tweetapp.backend.service.tweet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import com.tweetapp.backend.dao.tweet.TweetRepository;
@@ -15,8 +14,8 @@ public class TweetFetchServiceImpl implements TweetFetchService {
     @Autowired
     private TweetRepository tweetRepository;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+//    @Autowired
+//    private MongoTemplate mongoTemplate;
 
     @Override
     public Page<Tweet> fetchGlobalFeed(Pageable pageRequest) {
@@ -25,7 +24,7 @@ public class TweetFetchServiceImpl implements TweetFetchService {
 
     @Override
     public Page<Tweet> fetchRecentPostsByAuthor(String authorEmail, Pageable pageRequest) {
-	System.out.println("fetchRecentPostsByAuthor : "+ authorEmail);
+	System.out.println("fetchRecentPostsByAuthor : " + authorEmail);
 	return tweetRepository.findAllOrderByCreatedAtDesc(authorEmail, pageRequest);
     }
 
