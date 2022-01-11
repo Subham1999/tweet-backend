@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import com.tweetapp.backend.models.User;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final int STATUS_FAILED = 0;
     private static final int STATUS_SUCCESS = 1;
@@ -49,24 +52,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ViewUserResponse viewUser(ViewUserRequest viewUserRequest) {
+	LOGGER.info("Inside 'viewUser' User {}", viewUserRequest.getMail());
 	if (Objects.isNull(viewUserRequest)) {
 	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(INVALID_ARGUMENT + viewUserRequest)
 		    .build();
 	}
-
 	final String mail = viewUserRequest.getMail();
 	if (Objects.isNull(mail)) {
 	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(PROVIDED_EMAIL_IS_NULL).build();
 	}
-
 	Optional<User> optionalUser = userRepository.findByEmail(mail);
-
 	if (optionalUser.isPresent()) {
+	    LOGGER.info("User {} found!!!", viewUserRequest.getMail());
 	    final User user = optionalUser.get();
 	    return ViewUserResponse.builder()._status_code(STATUS_SUCCESS)._message(USER_RECORD_FOUND)
 		    .dateOfJoin(user.getDateOfJoin()).firstName(user.getFirstName()).lastName(user.getLastName())
 		    .isSecretShared(user.isSecretShared()).email(user.getEmail()).build();
 	} else {
+	    LOGGER.error("User {} NOT found!!!", viewUserRequest.getMail());
 	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(NO_USER_FOUND_WITH_THIS_EMAIL + mail)
 		    .build();
 	}
@@ -74,8 +77,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
+	LOGGER.info("Inside 'createUser'");
 	// 'null' check
 	if (Objects.isNull(createUserRequest)) {
+	    LOGGER.error("createUserRequest is NULL");
 	    return CreateUserResponse.builder()._status_code(STATUS_FAILED)
 		    ._message(INVALID_ARGUMENT + createUserRequest).build();
 	}
@@ -83,6 +88,7 @@ public class UserServiceImpl implements UserService {
 	// Check whether 'email' already exists or not
 	final String email = createUserRequest.getEmail();
 	if (userExists(email)) {
+	    LOGGER.error("User {} already exists!", email);
 	    return CreateUserResponse.builder()._status_code(STATUS_FAILED)
 		    ._message(USER_RECORD_CANNOT_BE_CREATED + " email already exists!").build();
 	}
@@ -101,10 +107,12 @@ public class UserServiceImpl implements UserService {
 
 	try {
 	    final User savedUser = userRepository.save(user);
+	    LOGGER.info("User {} saved in DB!", email);
 	    createUserResponse = CreateUserResponse.builder()._status_code(STATUS_SUCCESS)._message(USER_RECORD_CREATED)
 		    .firstName(savedUser.getFirstName()).lastName(savedUser.getLastName()).email(savedUser.getEmail())
 		    .dateOfJoin(savedUser.getDateOfJoin()).build();
 	} catch (Exception e) {
+	    LOGGER.info("User {} can not be saved in DB!::: Exception : {}", email, e.getMessage());
 	    createUserResponse = CreateUserResponse.builder()._status_code(STATUS_FAILED)
 		    ._message(USER_RECORD_CANNOT_BE_CREATED + ExceptionUtils.getMessage(e)).build();
 	}
@@ -114,81 +122,82 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateUserResponse updateUser(final UpdateUserRequest updateUserRequest) {
+	LOGGER.info("Inside 'updateUser' User {}", updateUserRequest.getEmail());
 	if (Objects.isNull(updateUserRequest)) {
 	    return UpdateUserResponse.builder()._status_code(STATUS_FAILED)
 		    ._message(INVALID_ARGUMENT + updateUserRequest).build();
 	}
-
 	final String email = updateUserRequest.getEmail();
-
 	if (Objects.isNull(email)) {
 	    return UpdateUserResponse.builder()._status_code(STATUS_FAILED)._message(PROVIDED_EMAIL_IS_NULL).build();
 	}
-
 	final Optional<User> foundByEmail = userRepository.findByEmail(email);
-
 	if (foundByEmail.isPresent()) { // When 'email' present -- then can update
+	    LOGGER.info("User {} found in DB!!", email);
 	    final User user = foundByEmail.get();
-
 	    if (Objects.nonNull(updateUserRequest.getFirstName())) {
 		if (!StringUtils.equals(updateUserRequest.getFirstName(), user.getFirstName())) {
+		    LOGGER.info("User {} update for First Name!!", email);
 		    user.setFirstName(updateUserRequest.getFirstName());
 		}
 	    }
-
 	    if (Objects.nonNull(updateUserRequest.getLastName())) {
 		if (!StringUtils.equals(updateUserRequest.getLastName(), user.getLastName())) {
+		    LOGGER.info("User {} update for Last Name!!", email);
 		    user.setLastName(updateUserRequest.getLastName());
 		}
 	    }
-
 	    try {
 		final User updatedUser = userRepository.save(user);
-
+		LOGGER.info("User {} updated!!", email);
 		return UpdateUserResponse.builder()._status_code(STATUS_SUCCESS)._message(USER_RECORD_UPDATED)
 			.firstName(updatedUser.getFirstName()).lastName(updatedUser.getLastName()).email(email).build();
 	    } catch (Exception e) {
+		LOGGER.error("User {} can not be updated!! Exception : {}", email, e.getMessage());
 		return UpdateUserResponse.builder()._status_code(STATUS_FAILED)._message(USER_RECORD_NOT_UPDATED)
 			.email(email).build();
 	    }
 	} else { // When 'email' is not present -- cannot update!
+	    LOGGER.error("User {} NOT found in DB", email);
 	    return UpdateUserResponse.builder()._status_code(STATUS_FAILED)._message(NO_USER_FOUND_WITH_THIS_EMAIL)
 		    .email(email).build();
 	}
     }
 
+    @Deprecated
     @Override
     public LoginResponse attemptLogin(LoginRequest loginRequest) {
-	if (Objects.isNull(loginRequest)) {
-	    return LoginResponse.builder()._status_code(STATUS_FAILED)._message(INVALID_LOGIN_REQUEST).build();
-	}
-
-	final String encodedPassword = passwordEncoder.encode(loginRequest.getPassword());
-	final String email = loginRequest.getEmail();
-
-	if (Objects.isNull(encodedPassword) || Objects.isNull(email)) {
-	    return LoginResponse.builder()._status_code(STATUS_FAILED)
-		    ._message((Objects.isNull(encodedPassword) ? PASSWORD_CAN_NOT_BE_EMPTY_OR_NULL : "")
-			    + (Objects.isNull(email) ? EMAIL_CAN_NOT_BE_EMPTY_OR_NULL : ""))
-		    .build();
-	} else {
-	    final Optional<User> foundByEmail = userRepository.findByEmail(email);
-
-	    if (foundByEmail.isPresent()) {
-		final User user = foundByEmail.get();
-		final String password = user.getPassword();
-		if (StringUtils.equals(password, encodedPassword)) {
-		    return LoginResponse.builder()._status_code(STATUS_SUCCESS)._message("Credentials are matched")
-			    .build();
-		} else {
-		    return LoginResponse.builder()._status_code(STATUS_FAILED)._message("Credentials are not matched")
-			    .build();
-		}
-	    } else {
-		return LoginResponse.builder()._status_code(STATUS_SUCCESS)._message(NO_USER_FOUND_WITH_THIS_EMAIL)
-			.build();
-	    }
-	}
+//	if (Objects.isNull(loginRequest)) {
+//	    return LoginResponse.builder()._status_code(STATUS_FAILED)._message(INVALID_LOGIN_REQUEST).build();
+//	}
+//
+//	final String encodedPassword = passwordEncoder.encode(loginRequest.getPassword());
+//	final String email = loginRequest.getEmail();
+//
+//	if (Objects.isNull(encodedPassword) || Objects.isNull(email)) {
+//	    return LoginResponse.builder()._status_code(STATUS_FAILED)
+//		    ._message((Objects.isNull(encodedPassword) ? PASSWORD_CAN_NOT_BE_EMPTY_OR_NULL : "")
+//			    + (Objects.isNull(email) ? EMAIL_CAN_NOT_BE_EMPTY_OR_NULL : ""))
+//		    .build();
+//	} else {
+//	    final Optional<User> foundByEmail = userRepository.findByEmail(email);
+//
+//	    if (foundByEmail.isPresent()) {
+//		final User user = foundByEmail.get();
+//		final String password = user.getPassword();
+//		if (StringUtils.equals(password, encodedPassword)) {
+//		    return LoginResponse.builder()._status_code(STATUS_SUCCESS)._message("Credentials are matched")
+//			    .build();
+//		} else {
+//		    return LoginResponse.builder()._status_code(STATUS_FAILED)._message("Credentials are not matched")
+//			    .build();
+//		}
+//	    } else {
+//		return LoginResponse.builder()._status_code(STATUS_SUCCESS)._message(NO_USER_FOUND_WITH_THIS_EMAIL)
+//			.build();
+//	    }
+//	}
+	return null;
     }
 
     @Override
