@@ -41,6 +41,7 @@ public class MyWebSecurity extends WebSecurityConfigurerAdapter {
 	http.authorizeRequests().anyRequest().authenticated();
 
 	// HTTP Security Customization
+	http.cors();
 	http.csrf().disable();
 	http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

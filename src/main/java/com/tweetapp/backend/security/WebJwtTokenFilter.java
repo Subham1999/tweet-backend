@@ -8,6 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WebJwtTokenFilter extends OncePerRequestFilter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebJwtTokenFilter.class);
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
@@ -37,9 +41,6 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
 	    final FilterChain filterChain) throws ServletException, IOException {
 
-//	request.getHeaderNames().asIterator()
-//		.forEachRemaining(hn -> System.out.printf("Header::: %s --> %s\n", hn, request.getHeader(hn)));
-
 	final String authHeader = request.getHeader("Authorization");
 	String userName = null;
 	String jwtToken = null;
@@ -49,32 +50,29 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 	    try {
 		userName = jwtTokenUtil.extractUserName(jwtToken);
 	    } catch (Throwable throwable) {
-		System.out.println("Exception at \"doFilterInternal\" :: " + throwable.getMessage());
-//		throw throwable;
+		LOGGER.error("Exception at 'doFilterInternal()' :: {}", throwable.getMessage());
 	    }
 	}
 
 	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-	System.out.println("Auth header::" + authHeader);
-	System.out.println("Auth userName::" + userName);
-	System.out.println("Authentication::" + authentication);
+	LOGGER.info("Auth header::{}, userName::{}", authHeader, userName);
 
 	if (Objects.nonNull(userName) && Objects.isNull(authentication)) {
 	    final UserDetails loadUserByUsername = userDetailService.loadUserByUsername(userName);
 	    if (jwtTokenUtil.validateToken(jwtToken, loadUserByUsername)) {
 
-		System.out.println("USER Validated-----------------------");
+		LOGGER.info("USER Validated-----------------------");
 		final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 			jwtToken, null, loadUserByUsername.getAuthorities());
 		usernamePasswordAuthenticationToken
 			.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 	    } else {
-		System.out.println("USER NOT Validated-----------------------");
+		LOGGER.info("USER NOT Validated-----------------------");
 	    }
 	} else {
-	    System.out.println("USER NOT Validated because 'null' issue -----------------------");
+	    LOGGER.info("USER NOT Validated because 'null' issue -----------------------");
 	}
 
 	filterChain.doFilter(request, response);

@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,18 +42,23 @@ import com.tweetapp.backend.service.tweet.TweetViewConfigConstant;
 
 @RestController
 @RequestMapping(path = Urls.TWEET_BASE)
+@CrossOrigin
 public class RestTweetController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestTweetController.class);
 
     @Autowired
     private TweetService tweetService;
 
     @GetMapping("/hello")
     public String hello() {
+	LOGGER.info("Inside 'hello'");
 	return "Hello";
     }
 
     @PostMapping
     public CreateTweetResponse postNewTweet(@RequestBody CreateTweetRequest createTweetRequest) {
+	LOGGER.info("Inside 'postNewTweet'");
 	return tweetService.createTweet(createTweetRequest);
     }
 
@@ -61,9 +68,11 @@ public class RestTweetController {
 	    @RequestParam(required = false, defaultValue = "0") Integer pageOffset,
 	    @RequestParam(required = false, defaultValue = "10") Integer pageLength,
 	    @RequestParam(required = false, defaultValue = "createdAt_DESCENDING") String[] sortBy) {
-	TweetFetchType tweetFetchType;
 
-	System.out.println("Created by : " + createdBy);
+	LOGGER.info("Inside 'searchTweets', CreatedBy {}, fetchType {}, pageOffset {}, pageLength {}", createdBy,
+		fetchType, pageOffset, pageLength);
+
+	TweetFetchType tweetFetchType;
 
 	if (StringUtils.equalsIgnoreCase(fetchType, "globalfeed")) {
 	    tweetFetchType = TweetFetchType.GLOBAL_FEED;
@@ -82,7 +91,6 @@ public class RestTweetController {
 	}
 
 	return tweetService.viewTweets(new TweetViewConfig() {
-
 	    @Override
 	    public Pageable getPageRequest() {
 		final List<Order> orders = new ArrayList<>();
@@ -112,22 +120,26 @@ public class RestTweetController {
 
     @GetMapping("/{tweet_id}")
     public Tweet getOne(@PathVariable String tweet_id) {
+	LOGGER.info("Inside 'getOne'");
 	return tweetService.getOne(tweet_id);
     }
 
     @PostMapping("/reply")
     public ResponseEntity<Object> replyOnPost(@RequestBody @Valid ReplyTweetRequest replyTweetRequest) {
+	LOGGER.info("Inside 'replyOnPost'");
 	ReplyTweetResponse replyTweetResponse = tweetService.replyOnTweet(replyTweetRequest);
 	return ResponseEntity.ok(replyTweetResponse);
     }
 
     @PostMapping("/like")
     public LikeTweetResponse likeOnPost(@RequestBody @Valid LikeTweetRequest likeTweetRequest) {
+	LOGGER.info("Inside 'likeOnPost'");
 	return tweetService.likeOnTweet(likeTweetRequest);
     }
 
-    @DeleteMapping("/dislike")
+    @PostMapping("/dislike")
     public DeleteLikeResponse dislikeOnPost(@RequestBody @Valid DeleteLikeRequest deleteLikeRequest) {
+	LOGGER.info("Inside 'dislikeOnPost'");
 	return tweetService.deleteLikeOnTweet(deleteLikeRequest);
     }
 

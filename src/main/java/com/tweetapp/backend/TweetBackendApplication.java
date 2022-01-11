@@ -4,6 +4,8 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 import java.util.function.Predicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,8 +28,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableWebSecurity
 public class TweetBackendApplication {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TweetBackendApplication.class);
+
     public static void main(String[] args) {
 	SpringApplication.run(TweetBackendApplication.class, args);
+	LOGGER.info("TweetBackendApplication started");
     }
 
     @Autowired

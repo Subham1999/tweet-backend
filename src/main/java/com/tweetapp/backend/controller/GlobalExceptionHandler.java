@@ -3,6 +3,8 @@ package com.tweetapp.backend.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.ObjectError;
@@ -19,9 +21,13 @@ import io.jsonwebtoken.ExpiredJwtException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(
 	    final MethodArgumentNotValidException exception) {
+
+	LOGGER.info("Handling MethodArgumentNotValidException msg:{}", exception.getMessage());
 	String message = exception.getMessage();
 	List<ObjectError> allErrors = exception.getAllErrors();
 	Map<String, Object> map = Map.of("err-message", (Object) message, "errors", (Object) allErrors);
@@ -40,6 +46,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = { HttpMessageNotReadableException.class, PasswordMismatchException.class,
 	    ExpiredJwtException.class, InternalServerException.class, InvalidRequest.class })
     public ResponseEntity<Map<String, Object>> handleApplicationRuntimeExceptions(final RuntimeException exception) {
+
+	LOGGER.info("Handling RuntimeException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
 	String message = exception.getMessage();
 	Map<String, Object> map = Map.of("err-message", message);
 
@@ -49,6 +57,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Map<String, Object>> handleNullPointerException(final NullPointerException exception) {
 	String message = exception.getMessage();
+	LOGGER.info("Handling NullPointerException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
 	Map<String, Object> map = Map.of("err-message", message);
 
 	return ResponseEntity.status(466).body(map);

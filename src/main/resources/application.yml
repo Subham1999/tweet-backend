@@ -22,4 +22,4 @@ swagger_api_doc:
   license_url: subham_santra@dummy_license.com
   version: v1.0
   
-jwt.lifetime: 1800000
+jwt.lifetime: 600000

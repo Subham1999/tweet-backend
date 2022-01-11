@@ -1,10 +1,14 @@
 package com.tweetapp.backend.dto.tweet.like;
 
-import com.tweetapp.backend.dto.Response;
+import java.util.Set;
 
-import lombok.experimental.SuperBuilder;
+import com.tweetapp.backend.models.Like;
 
-@SuperBuilder
-public class DeleteLikeResponse extends Response {
+import lombok.Builder;
+import lombok.Data;
 
+@Builder
+@Data
+public class DeleteLikeResponse {
+    private Set<Like> likes;
 }

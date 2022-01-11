@@ -3,11 +3,14 @@ package com.tweetapp.backend.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +30,10 @@ import com.tweetapp.backend.security.JwtTokenUtil;
 
 @RestController
 @RequestMapping(path = "/auth")
+@CrossOrigin
 public class AuthController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -44,21 +50,25 @@ public class AuthController {
     @PostMapping("/generate_token")
     public AuthResponse generateToken(@RequestBody AuthRequest authReq) {
 
+	LOGGER.info("Inside 'generateToken'");
 	String password = authReq.getPassword();
 	String email = authReq.getEmail();
 
 	Optional<com.tweetapp.backend.models.User> optional = userRepository.findByEmail(email);
 
 	if (optional.isPresent()) {
+	    LOGGER.info("User found for email : {}", email);
 	    String existingPassword = optional.get().getPassword();
 	    if (passwordEncoder.matches(password, existingPassword)) {
+		LOGGER.info("User password matched");
 		String jwtToken = jwtTokenUtil.generateToken(createTmpUser(authReq.getEmail(), authReq.getPassword()));
-		AuthResponse authRes = new AuthResponse(jwtToken);
-		return authRes;
+		return AuthResponse.builder().jwtToken(jwtToken).userEmail(email).build();
 	    } else {
+		LOGGER.error("User password NOT matched");
 		throw new PasswordMismatchException("Password in db is not matching");
 	    }
 	} else {
+	    LOGGER.error("User email: {} is not registered..", email);
 	    throw new InvalidRequest("User email is not a registered email");
 	}
 
@@ -71,7 +81,7 @@ public class AuthController {
 
     @PostMapping("/forgot_password")
     public ForgotPasswordResponse forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
-	System.out.println(forgotPasswordRequest);
+	LOGGER.info("Inside 'forgotPassword'");
 
 	String email = forgotPasswordRequest.getEmail();
 	String secret = forgotPasswordRequest.getSecret();
@@ -80,26 +90,36 @@ public class AuthController {
 	Optional<com.tweetapp.backend.models.User> optional = userRepository.findByEmail(email);
 
 	if (optional.isPresent()) {
+	    LOGGER.info("User found for email : {}", email);
 	    com.tweetapp.backend.models.User user = optional.get();
 	    Optional<ForgotPasswordAnswer> optionalSecret = secretRepository.findById(email);
 	    if (optionalSecret.isPresent() && passwordEncoder.matches(secret, optionalSecret.get().getAnswer())) {
+		LOGGER.info("User email: {} --secret matched", email);
 		user.setPassword(newPassword);
-		com.tweetapp.backend.models.User user2 = userRepository.save(user);
-		ForgotPasswordResponse forgotPasswordResponse = new ForgotPasswordResponse();
-		forgotPasswordResponse.setEmail(user2.getEmail());
-		String jwt = jwtTokenUtil.generateToken(createTmpUser(user2.getEmail(), user2.getPassword()));
-		forgotPasswordResponse.setToken(jwt);
-		return forgotPasswordResponse;
+		try {
+		    com.tweetapp.backend.models.User user2 = userRepository.save(user);
+		    LOGGER.info("User email: {} password updated!!!!", email);
+		    ForgotPasswordResponse forgotPasswordResponse = new ForgotPasswordResponse();
+		    forgotPasswordResponse.setEmail(user2.getEmail());
+		    String jwt = jwtTokenUtil.generateToken(createTmpUser(user2.getEmail(), user2.getPassword()));
+		    forgotPasswordResponse.setToken(jwt);
+		    return forgotPasswordResponse;
+		} catch (RuntimeException e) {
+		    LOGGER.error("User email: {} --Exception while saving new password", email);
+		    throw new InvalidRequest("Exception :: ", e);
+		}
 	    } else {
+		LOGGER.error("User email: {} --secret is not matching", email);
 		throw new InvalidRequest("Invalid REQUIRED user secret");
 	    }
 	} else {
+	    LOGGER.error("User email: {} is not registered..", email);
 	    throw new InvalidRequest("Invalid REQUIRED user email");
 	}
 
     }
 
-    @GetMapping
+    @GetMapping("/token_validation")
     public String working() {
 	return "working...";
     }

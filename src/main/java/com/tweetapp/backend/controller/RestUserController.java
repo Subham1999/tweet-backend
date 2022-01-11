@@ -6,10 +6,13 @@ import java.util.regex.Pattern;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +32,10 @@ import com.tweetapp.backend.service.user.UserService;
 
 @RestController
 @RequestMapping(path = Urls.USER_BASE)
+@CrossOrigin
 public class RestUserController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestUserController.class);
 
     @Autowired
     private UserService userService;
@@ -51,20 +57,25 @@ public class RestUserController {
 
     @RequestMapping(path = Urls.HEALTH_CHECK, method = RequestMethod.GET)
     public HealthCheckResponse healthCheck() {
+	LOGGER.info("Inside 'healthCheck'");
 	return HealthCheckResponse.builder().serverStatus(SERVER_CONDITION_GOOD).build();
     }
 
     @RequestMapping(path = "/search/{email}", method = RequestMethod.GET)
     public ViewUserResponse viewUser(@PathVariable @Email String email) {
+	LOGGER.info("Inside 'viewUser'");
 	return userService.viewUser(ViewUserRequest.builder().mail(email).build());
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
+	LOGGER.info("Inside 'createUser'");
 	CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
 	if (createUserResponse.get_status_code() == 0) {
+	    LOGGER.info("Registration failed!!");
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createUserResponse);
 	} else {
+	    LOGGER.error("Registration successful!!");
 	    return ResponseEntity.status(HttpStatus.OK).body(createUserResponse);
 	}
     }
@@ -73,7 +84,10 @@ public class RestUserController {
     public ResponseEntity<Object> updateUser(@PathVariable(required = true) String email,
 	    @RequestBody UpdateUserRequest updateUserRequest) {
 
+	LOGGER.info("Inside 'updateUser'");
+
 	if (!isValidEmail(email)) {
+	    LOGGER.info("Email is not valid {}", email);
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid email id provided : " + email);
 	}
 
@@ -81,8 +95,10 @@ public class RestUserController {
 
 	UpdateUserResponse updateUser = userService.updateUser(updateUserRequest);
 	if (updateUser.get_status_code() == 0) {
+	    LOGGER.error("User {} can not be updated!", email);
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updateUser);
 	} else {
+	    LOGGER.info("User {} updated!", email);
 	    return ResponseEntity.status(HttpStatus.OK).body(updateUser);
 	}
     }
@@ -95,9 +111,11 @@ public class RestUserController {
     @PostMapping("/secret_share")
     public ResponseEntity<?> storeSecrets(@RequestBody @Valid ForgotPasswordAnswer forgotPasswordAnswer) {
 
+	LOGGER.info("Inside 'storeSecrets'");
 	String userEmail = forgotPasswordAnswer.getUserEmail();
 
 	if (userService.userExists(userEmail)) {
+	    LOGGER.info("User {} exists!", userEmail);
 	    try {
 		String answer = forgotPasswordAnswer.getAnswer();
 		answer = passwordEncoder.encode(answer);
@@ -105,9 +123,11 @@ public class RestUserController {
 		secretRepository.save(forgotPasswordAnswer);
 		return ResponseEntity.ok("Secret stored");
 	    } catch (Exception e) {
+		LOGGER.error("Exception while saving secrets {}", e.getMessage());
 		return ResponseEntity.internalServerError().body(e.getMessage());
 	    }
 	} else {
+	    LOGGER.error("User {} does not exists!", userEmail);
 	    return ResponseEntity.badRequest().body("user email " + userEmail + " is not associated with any user");
 	}
     }
