@@ -101,7 +101,6 @@ public class RestTweetController {
 			orders.add(Order.asc(sortByParam));
 		    }
 		}
-		System.out.println(orders);
 		final PageRequest pageRequest = PageRequest.of(pageOffset, pageLength, Sort.by(orders));
 		return pageRequest;
 	    }

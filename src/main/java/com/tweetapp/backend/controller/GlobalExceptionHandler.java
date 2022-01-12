@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(
 	    final MethodArgumentNotValidException exception) {
 
-	LOGGER.info("Handling MethodArgumentNotValidException msg:{}", exception.getMessage());
+	LOGGER.error("Handling MethodArgumentNotValidException msg:{}", exception.getMessage());
 	String message = exception.getMessage();
 	List<ObjectError> allErrors = exception.getAllErrors();
 	Map<String, Object> map = Map.of("err-message", (Object) message, "errors", (Object) allErrors);
@@ -47,17 +47,23 @@ public class GlobalExceptionHandler {
 	    ExpiredJwtException.class, InternalServerException.class, InvalidRequest.class })
     public ResponseEntity<Map<String, Object>> handleApplicationRuntimeExceptions(final RuntimeException exception) {
 
-	LOGGER.info("Handling RuntimeException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
+	LOGGER.error("Handling RuntimeException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
 	String message = exception.getMessage();
 	Map<String, Object> map = Map.of("err-message", message);
+	int statusCode = 452;
 
-	return ResponseEntity.status(452).body(map);
+	if (exception instanceof ExpiredJwtException) {
+	    statusCode = 460;
+	}
+
+	return ResponseEntity.status(statusCode).body(map);
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Map<String, Object>> handleNullPointerException(final NullPointerException exception) {
 	String message = exception.getMessage();
-	LOGGER.info("Handling NullPointerException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
+	LOGGER.error("Handling NullPointerException::{} msg:{}", exception.getClass().getName(),
+		exception.getMessage());
 	Map<String, Object> map = Map.of("err-message", message);
 
 	return ResponseEntity.status(466).body(map);

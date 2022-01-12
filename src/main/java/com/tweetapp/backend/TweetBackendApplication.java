@@ -31,8 +31,8 @@ public class TweetBackendApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(TweetBackendApplication.class);
 
     public static void main(String[] args) {
+	LOGGER.info("TweetBackendApplication starting...");
 	SpringApplication.run(TweetBackendApplication.class, args);
-	LOGGER.info("TweetBackendApplication started");
     }
 
     @Autowired
@@ -58,6 +58,7 @@ public class TweetBackendApplication {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+	LOGGER.info("PasswordEncoder Bean method invoked");
 	return new BCryptPasswordEncoder();
     }
 }

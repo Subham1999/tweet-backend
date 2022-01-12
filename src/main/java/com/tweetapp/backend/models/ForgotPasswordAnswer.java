@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-@Document(collection = "FORGOT_PASSWORD_SECRETS")
+@Document(collection = "USER_SECRETS")
 public class ForgotPasswordAnswer {
 
     @Id

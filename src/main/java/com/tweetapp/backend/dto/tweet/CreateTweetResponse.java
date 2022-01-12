@@ -4,15 +4,14 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.tweetapp.backend.dto.Response;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
+@Builder
 @Data
 @JsonInclude(Include.NON_NULL)
-public class CreateTweetResponse extends Response {
+public class CreateTweetResponse {
     private String id;
     private String content;
     private String createdBy;

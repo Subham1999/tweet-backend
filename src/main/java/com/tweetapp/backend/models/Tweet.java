@@ -16,7 +16,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @Builder
-@Document(collection = "tweet")
+@Document(collection = "TWEET_DETAILS")
 public class Tweet {
     @Id
     private String id;

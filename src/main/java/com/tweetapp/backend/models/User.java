@@ -14,7 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-@Document(collection = "user")
+@Document(collection = "USER_DETAILS")
 public class User {
     private String firstName;
     private String lastName;

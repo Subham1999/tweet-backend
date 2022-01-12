@@ -20,9 +20,9 @@
 //@Component
 //public class Slf4jMDCFilter extends OncePerRequestFilter {
 //
-//    private final String responseHeader;
-//    private final String mdcTokenKey;
-//    private final String requestHeader;
+//    private final String mdcTokenKey = "req_id";
+//    private final String responseHeader = "X-tweet-app-res-ID";
+//    private final String requestHeader = "X-tweet-app-req-ID";
 //
 //    @Override
 //    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
@@ -32,7 +32,7 @@
 //	    if (!StringUtils.isEmpty(requestHeader) && !StringUtils.isEmpty(request.getHeader(requestHeader))) {
 //		token = request.getHeader(requestHeader);
 //	    } else {
-//		token = UUID.randomUUID().toString().toUpperCase().replace("-", "");
+//		token = UUID.randomUUID().toString().toUpperCase().replace("-", "_");
 //	    }
 //	    MDC.put(mdcTokenKey, token);
 //	    if (!StringUtils.isEmpty(responseHeader)) {

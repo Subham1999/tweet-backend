@@ -64,8 +64,7 @@ public class TweetServiceImpl implements TweetService {
 	    final Tweet savedTweet = tweetRepository.save(tweet);
 	    LOGGER.info("Tweet saved tweetId {}", savedTweet.getId());
 
-	    return CreateTweetResponse.builder()._status_code(1)._message("Tweet created")
-		    .createdAt(savedTweet.getCreatedAt()).content(savedTweet.getContent())
+	    return CreateTweetResponse.builder().createdAt(savedTweet.getCreatedAt()).content(savedTweet.getContent())
 		    .createdBy(savedTweet.getCreatedBy()).id(savedTweet.getId()).build();
 
 	} else {

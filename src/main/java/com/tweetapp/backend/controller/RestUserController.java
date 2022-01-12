@@ -72,10 +72,10 @@ public class RestUserController {
 	LOGGER.info("Inside 'createUser'");
 	CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
 	if (createUserResponse.get_status_code() == 0) {
-	    LOGGER.info("Registration failed!!");
+	    LOGGER.error("Registration failed!!");
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createUserResponse);
 	} else {
-	    LOGGER.error("Registration successful!!");
+	    LOGGER.info("Registration successful!!");
 	    return ResponseEntity.status(HttpStatus.OK).body(createUserResponse);
 	}
     }

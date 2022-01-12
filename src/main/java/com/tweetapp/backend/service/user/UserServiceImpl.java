@@ -40,9 +40,9 @@ public class UserServiceImpl implements UserService {
     private static final String USER_RECORD_FOUND = "User record found";
     private static final String USER_RECORD_UPDATED = "User record updated";
     private static final String USER_RECORD_NOT_UPDATED = "User record can not be updated";
-    private static final String INVALID_LOGIN_REQUEST = "Invalid login request";
-    private static final String EMAIL_CAN_NOT_BE_EMPTY_OR_NULL = " Email can not be empty or null";
-    private static final String PASSWORD_CAN_NOT_BE_EMPTY_OR_NULL = "Password can not be empty or null ";
+//    private static final String INVALID_LOGIN_REQUEST = "Invalid login request";
+//    private static final String EMAIL_CAN_NOT_BE_EMPTY_OR_NULL = " Email can not be empty or null";
+//    private static final String PASSWORD_CAN_NOT_BE_EMPTY_OR_NULL = "Password can not be empty or null ";
 
     @Autowired
     private UserRepository userRepository;
