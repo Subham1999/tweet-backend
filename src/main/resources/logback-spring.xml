@@ -13,7 +13,18 @@
 		</layout>
 	</appender>
 
+	<!-- <appender name="Kafka" class="com.github.danielwegener.logback.kafka.KafkaAppender"> 
+		<encoder> <patternLayout class="ch.qos.logback.contrib.json.classic.JsonLayout"> 
+		<jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter"> 
+		<prettyPrint>false</prettyPrint> </jsonFormatter> <timestampFormat>dd.MM.yyyy' 
+		'HH.mm.ss.SSS</timestampFormat> </patternLayout> </encoder> <keyingStrategy 
+		class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" 
+		/> <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" 
+		/> <topic>logs</topic> <producerConfig>bootstrap.servers=localhost:9092</producerConfig> 
+		</appender> -->
+
 	<root level="info">
 		<appender-ref ref="Console" />
+		<!-- <appender-ref ref="Kafka" /> -->
 	</root>
 </configuration>

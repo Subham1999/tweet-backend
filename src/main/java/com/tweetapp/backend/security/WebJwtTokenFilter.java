@@ -79,24 +79,25 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 		}
 	    }
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    LOGGER.info("request : {}, method : {}, authorization : {}, user-email : {}", request.getRequestURI(), 
-		    request.getMethod(),
-		    (isHeaderPresent(authHeader) ? "<SECRET**JWT_TOKEN>" : "<EMPTY_STRING>"), userName);
+	    LOGGER.info("request : {}, method : {}, Request header 'Authorization' : {}, user-email : {}", request.getRequestURI(),
+		    request.getMethod(), (isHeaderPresent(authHeader) ? "'present'" : "'NOT present'"),
+		    userName);
 	    if (Objects.nonNull(userName) && Objects.isNull(authentication)) {
 		final UserDetails loadUserByUsername = userDetailService.loadUserByUsername(userName);
 		if (jwtTokenUtil.validateToken(jwtToken, loadUserByUsername)) {
-
-		    LOGGER.info("USER Validated-----------------------");
+		    LOGGER.info("#################### USER Validated-----------------------");
 		    final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 			    jwtToken, null, loadUserByUsername.getAuthorities());
 		    usernamePasswordAuthenticationToken
 			    .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 		} else {
-		    LOGGER.info("USER NOT Validated-----------------------");
+		    LOGGER.info("#################### USER NOT Validated-----------------------");
 		}
 	    } else {
-		LOGGER.info("USER NOT Validated because 'null' issue -----------------------");
+		final String issue = isHeaderPresent(authHeader) ? "JWT Expired Or JWT Parse error"
+			: "Internal Server error";
+		LOGGER.error("#################### USER NOT Validated because {}", issue);
 	    }
 	    filterChain.doFilter(request, response);
 	} catch (Exception e) {
