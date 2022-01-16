@@ -35,10 +35,7 @@ jwt.lifetime: 3600000 # 60 minute
 #jwt.lifetime: 3000 # 3 second
 #jwt.lifetime: 3000 # 3 second
 
-<<<<<<< HEAD
-
 admin:
   email: ${ADMIN_NAME:subham.santra@cognizant.com}
   password: ${ADMIN_PASSWORD:changeit}
-=======
->>>>>>> b61263643de5accfc356ed9e5bcbcd18f3aa4306
+
