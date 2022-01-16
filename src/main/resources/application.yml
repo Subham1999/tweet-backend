@@ -26,3 +26,4 @@ jwt.lifetime: 3600000 # 60 minute
 #jwt.lifetime: 60000 # 1 minute
 #jwt.lifetime: 3000 # 3 second
 #jwt.lifetime: 3000 # 3 second
+
