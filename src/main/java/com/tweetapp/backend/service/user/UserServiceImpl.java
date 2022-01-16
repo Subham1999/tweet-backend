@@ -1,16 +1,20 @@
 package com.tweetapp.backend.service.user;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +23,14 @@ import com.tweetapp.backend.dto.user.CreateUserRequest;
 import com.tweetapp.backend.dto.user.CreateUserResponse;
 import com.tweetapp.backend.dto.user.UpdateUserRequest;
 import com.tweetapp.backend.dto.user.UpdateUserResponse;
+import com.tweetapp.backend.dto.user.Users;
 import com.tweetapp.backend.dto.user.ViewUserRequest;
 import com.tweetapp.backend.dto.user.ViewUserResponse;
 import com.tweetapp.backend.dto.user.auth.LoginRequest;
 import com.tweetapp.backend.dto.user.auth.LoginResponse;
+import com.tweetapp.backend.exceptions.InvalidRequest;
 import com.tweetapp.backend.models.User;
+import com.tweetapp.backend.service.tweet.HttpRequestDataHolder;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,12 +44,15 @@ public class UserServiceImpl implements UserService {
     private static final String USER_RECORD_CREATED = "User record created";
     private static final String NO_USER_FOUND_WITH_THIS_EMAIL = "No user found with this email : ";
     private static final String PROVIDED_EMAIL_IS_NULL = "Provided email is null";
-    private static final String USER_RECORD_FOUND = "User record found";
+//    private static final String USER_RECORD_FOUND = "User record found";
     private static final String USER_RECORD_UPDATED = "User record updated";
     private static final String USER_RECORD_NOT_UPDATED = "User record can not be updated";
 //    private static final String INVALID_LOGIN_REQUEST = "Invalid login request";
 //    private static final String EMAIL_CAN_NOT_BE_EMPTY_OR_NULL = " Email can not be empty or null";
 //    private static final String PASSWORD_CAN_NOT_BE_EMPTY_OR_NULL = "Password can not be empty or null ";
+
+    @Autowired
+    private Provider<HttpRequestDataHolder> provider;
 
     @Autowired
     private UserRepository userRepository;
@@ -54,24 +64,28 @@ public class UserServiceImpl implements UserService {
     public ViewUserResponse viewUser(ViewUserRequest viewUserRequest) {
 	LOGGER.info("Inside 'viewUser' User {}", viewUserRequest.getMail());
 	if (Objects.isNull(viewUserRequest)) {
-	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(INVALID_ARGUMENT + viewUserRequest)
-		    .build();
+//	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(INVALID_ARGUMENT + viewUserRequest)
+//		    .build();
+	    throw new InvalidRequest("Request body is empty");
 	}
 	final String mail = viewUserRequest.getMail();
 	if (Objects.isNull(mail)) {
-	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(PROVIDED_EMAIL_IS_NULL).build();
+//	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(PROVIDED_EMAIL_IS_NULL).build();
+	    throw new InvalidRequest("Mail is NULL");
 	}
+
 	Optional<User> optionalUser = userRepository.findByEmail(mail);
 	if (optionalUser.isPresent()) {
 	    LOGGER.info("User {} found!!!", viewUserRequest.getMail());
 	    final User user = optionalUser.get();
-	    return ViewUserResponse.builder()._status_code(STATUS_SUCCESS)._message(USER_RECORD_FOUND)
-		    .dateOfJoin(user.getDateOfJoin()).firstName(user.getFirstName()).lastName(user.getLastName())
-		    .isSecretShared(user.isSecretShared()).email(user.getEmail()).build();
+
+	    final String tweetURL = "tweets/search?fetchType=recentposts&created_by=" + user.getEmail();
+	    return ViewUserResponse.builder().dateOfJoin(user.getDateOfJoin()).firstName(user.getFirstName())
+		    .lastName(user.getLastName()).isSecretShared(user.isSecretShared()).email(user.getEmail())
+		    ._tweet_resourse_uri(tweetURL).build();
 	} else {
 	    LOGGER.error("User {} NOT found!!!", viewUserRequest.getMail());
-	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(NO_USER_FOUND_WITH_THIS_EMAIL + mail)
-		    .build();
+	    throw new InvalidRequest("User NOT found");
 	}
     }
 
@@ -201,8 +215,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean userExists(@NotNull String email) {
+    public boolean userExists(String email) {
 	return userRepository.existsById(email);
     }
 
+    @Override
+    public Users getAllUsers(PageRequest pageRequest) {
+	LOGGER.info("Inside 'getAllUsers'...");
+	try {
+	    final Page<User> page = userRepository.findAll(pageRequest);
+	    final List<ViewUserResponse> user = page.getContent().stream().map(this::mapToView)
+		    .collect(Collectors.toList());
+	    boolean first = page.isFirst();
+	    boolean last = page.isLast();
+	    boolean empty = page.isEmpty();
+	    Users users = Users.builder().user(user).isEmpty(empty).isFirst(first).isLast(last).build();
+	    return users;
+	} catch (Exception e) {
+	    LOGGER.info("############## Exception : {}", ExceptionUtils.getStackTrace(e));
+	    throw new RuntimeException(e);
+	}
+    }
+
+    public ViewUserResponse mapToView(User user) {
+
+	return ViewUserResponse.builder()
+		._tweet_resourse_uri("tweets/search?fetchType=recentposts&created_by=".concat(user.getEmail()))
+		.email(user.getEmail()).dateOfJoin(user.getDateOfJoin()).firstName(user.getFirstName())
+		.lastName(user.getLastName()).isSecretShared(user.isSecretShared()).build();
+    }
+
+    @Override
+    public Users searchUser(final String key) {
+	LOGGER.info("Searching User.... KEY : {}", key);
+	final List<ViewUserResponse> users = userRepository.findUserByKey(key).stream().map(this::mapToView)
+		.collect(Collectors.toList());
+
+	return Users.builder().user(users).isEmpty(users.isEmpty()).isFirst(true).isLast(true).build();
+    }
 }

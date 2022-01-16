@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,12 +29,18 @@ import com.tweetapp.backend.exceptions.PasswordMismatchException;
 import com.tweetapp.backend.models.ForgotPasswordAnswer;
 import com.tweetapp.backend.security.JwtTokenUtil;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 @RestController
 @RequestMapping(path = "/auth")
 @CrossOrigin
 public class AuthController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
+
+    @Value("${admin.email}")
+    public String adminEmail;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -48,7 +55,9 @@ public class AuthController {
     private ProfileSecretRepository secretRepository;
 
     @PostMapping("/generate_token")
-    public AuthResponse generateToken(@RequestBody AuthRequest authReq) {
+    @ApiOperation(value = "Generates a jwt token", notes = "Generates jwt token with help of provided 'email' & 'password' in request body", response = AuthResponse.class, produces = "application/json", consumes = "application/json")
+    public AuthResponse generateToken(
+	    @ApiParam(value = "Authentication Request META DATA", required = true) @RequestBody AuthRequest authReq) {
 
 	LOGGER.info("Inside 'generateToken'");
 	String password = authReq.getPassword();
@@ -74,13 +83,19 @@ public class AuthController {
 
     }
 
-    private UserDetails createTmpUser(String email, String password) {
-	return User.withUsername(email).password(password).authorities(List.of(new SimpleGrantedAuthority("USER")))
-		.build();
+    private UserDetails createTmpUser(final String email, final String password) {
+	final List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("USER"));
+	if (email.equals(adminEmail)) {
+	    authorities.add(new SimpleGrantedAuthority("ADMIN"));
+	}
+	return User.withUsername(email).password(password).authorities(authorities).build();
     }
 
     @PostMapping("/forgot_password")
-    public ForgotPasswordResponse forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+    @ApiOperation(value = "When user forgot password", notes = "Generates jwt token, when user "
+	    + "forgot his/her password but need to provide formatted secret along with new password, password will be updated and user will get jwt token", response = ForgotPasswordResponse.class, produces = "application/json", consumes = "application/json")
+    public ForgotPasswordResponse forgotPassword(
+	    @ApiParam(value = "Forgot password request") @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
 	LOGGER.info("Inside 'forgotPassword'");
 
 	String email = forgotPasswordRequest.getEmail();

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tweetapp.backend.dto.tweet.CreateTweetRequest;
 import com.tweetapp.backend.dto.tweet.CreateTweetResponse;
+import com.tweetapp.backend.dto.tweet.UpdateTweetRequest;
+import com.tweetapp.backend.dto.tweet.UpdateTweetResponse;
 import com.tweetapp.backend.dto.tweet.like.DeleteLikeRequest;
 import com.tweetapp.backend.dto.tweet.like.DeleteLikeResponse;
 import com.tweetapp.backend.dto.tweet.like.LikeTweetRequest;
@@ -39,6 +42,8 @@ import com.tweetapp.backend.service.tweet.TweetFetchType;
 import com.tweetapp.backend.service.tweet.TweetService;
 import com.tweetapp.backend.service.tweet.TweetViewConfig;
 import com.tweetapp.backend.service.tweet.TweetViewConfigConstant;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping(path = Urls.TWEET_BASE)
@@ -63,7 +68,7 @@ public class RestTweetController {
     }
 
     @GetMapping("/search")
-    public Page<Tweet> searchTweets(@RequestParam(required = false) String createdBy,
+    public Page<Tweet> searchTweets(@RequestParam(required = false, name = "created_by") String createdBy,
 	    @RequestParam(required = false, defaultValue = "globalFeed") String fetchType,
 	    @RequestParam(required = false, defaultValue = "0") Integer pageOffset,
 	    @RequestParam(required = false, defaultValue = "10") Integer pageLength,
@@ -121,6 +126,14 @@ public class RestTweetController {
     public Tweet getOne(@PathVariable String tweet_id) {
 	LOGGER.info("Inside 'getOne'");
 	return tweetService.getOne(tweet_id);
+    }
+
+    @PutMapping("/{tweet_id}")
+    @ApiOperation(value = "Updates a tweet", notes = "Updates an already created tweet. tweet author and updator should be same user!!")
+    public UpdateTweetResponse updateOne(@PathVariable String tweet_id,
+	    @RequestBody UpdateTweetRequest updateTweetRequest) {
+	LOGGER.info("Inside 'updateOne...' tweet_id : {}", tweet_id);
+	return tweetService.updateTweet(updateTweetRequest);
     }
 
     @PostMapping("/reply")

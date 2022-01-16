@@ -24,6 +24,8 @@ public class Tweet {
     private String createdBy;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date updatedAt;
     private LinkedHashSet<Like> likes;
     private LinkedList<Reply> replies;
 }

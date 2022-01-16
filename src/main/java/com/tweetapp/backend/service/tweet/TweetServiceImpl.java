@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.inject.Provider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,9 @@ public class TweetServiceImpl implements TweetService {
     @Autowired
     private TweetFetchService tweetFetchService;
 
+    @Autowired
+    private Provider<HttpRequestDataHolder> provider;
+
     @Override
     public CreateTweetResponse createTweet(CreateTweetRequest createTweetRequest) {
 	LOGGER.info("Inside 'createTweet'");
@@ -77,7 +82,31 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public UpdateTweetResponse updateTweet(UpdateTweetRequest updateTweetRequest) {
-	return null;
+	String id = updateTweetRequest.getId();
+	String new_content = updateTweetRequest.getNew_content();
+	LOGGER.info("Inside 'updateTweet'... tweet ID : {}", id);
+	final String userEmail = provider.get().getUser();
+
+	Optional<Tweet> optional = tweetRepository.findById(id);
+	if (optional.isPresent()) {
+	    LOGGER.info("Tweet found updating!!");
+	    final Tweet tweet = optional.get();
+
+	    if (!tweet.getCreatedBy().equals(userEmail)) {
+		LOGGER.error("Tweet id {} is created by {}!!!! SO other user can not update!!", id,
+			tweet.getCreatedBy());
+		throw new InvalidRequest("Tweet is created by " + tweet.getCreatedBy());
+	    }
+
+	    tweet.setContent(new_content);
+	    tweet.setUpdatedAt(new Date());
+	    final Tweet tweet2 = tweetRepository.save(tweet);
+	    LOGGER.info("Tweet updated!!");
+	    return UpdateTweetResponse.builder().tweet(tweet2).build();
+	} else {
+	    LOGGER.error("Tweet NOT founf for ID : {}", id);
+	    throw new InvalidRequest("Invalid tweet id : " + id + " !!");
+	}
     }
 
     @Override

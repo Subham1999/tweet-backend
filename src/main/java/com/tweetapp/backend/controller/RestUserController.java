@@ -9,15 +9,18 @@ import javax.validation.constraints.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tweetapp.backend.dao.secrets.ProfileSecretRepository;
@@ -25,6 +28,7 @@ import com.tweetapp.backend.dto.user.CreateUserRequest;
 import com.tweetapp.backend.dto.user.CreateUserResponse;
 import com.tweetapp.backend.dto.user.UpdateUserRequest;
 import com.tweetapp.backend.dto.user.UpdateUserResponse;
+import com.tweetapp.backend.dto.user.Users;
 import com.tweetapp.backend.dto.user.ViewUserRequest;
 import com.tweetapp.backend.dto.user.ViewUserResponse;
 import com.tweetapp.backend.models.ForgotPasswordAnswer;
@@ -61,10 +65,16 @@ public class RestUserController {
 	return HealthCheckResponse.builder().serverStatus(SERVER_CONDITION_GOOD).build();
     }
 
-    @RequestMapping(path = "/search/{email}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{email}", method = RequestMethod.GET)
     public ViewUserResponse viewUser(@PathVariable @Email String email) {
 	LOGGER.info("Inside 'viewUser'");
 	return userService.viewUser(ViewUserRequest.builder().mail(email).build());
+    }
+
+    @GetMapping(path = "/search")
+    public Users searchUsers(@RequestParam(required = true) String key) {
+	LOGGER.info("Inside 'searchUsers' KEY : {}", key);
+	return userService.searchUser(key);
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
@@ -132,4 +142,13 @@ public class RestUserController {
 	}
     }
 
+    @GetMapping
+    public Users getAllUsers(
+	    @RequestParam(name = "pageLength", required = false, defaultValue = "30") String pageLength,
+	    @RequestParam(name = "pageOffset", required = false, defaultValue = "0") String pageOffset) {
+	LOGGER.info("Inside 'getAllUsers'");
+	int page = Integer.parseInt(pageOffset);
+	int size = Integer.parseInt(pageLength);
+	return userService.getAllUsers(PageRequest.of(page, size));
+    }
 }

@@ -15,8 +15,6 @@ import lombok.Data;
 @Builder
 @JsonInclude(Include.NON_NULL)
 public class ViewUserResponse {
-    private String _message;
-    private int _status_code;
 
     private String firstName;
     private String lastName;
@@ -25,4 +23,6 @@ public class ViewUserResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfJoin;
     private boolean isSecretShared;
+
+    private String _tweet_resourse_uri;
 }

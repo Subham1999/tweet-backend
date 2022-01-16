@@ -18,6 +18,6 @@ public class ForgotPasswordAnswer {
     @Email
     private String userEmail;
 
-    @Pattern(regexp = "[0-9]{11}", message = "Invalid secret key")
+    @Pattern(regexp = "[0-9]{8}", message = "Invalid secret key")
     private String answer;
 }

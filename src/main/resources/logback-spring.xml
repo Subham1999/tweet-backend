@@ -6,7 +6,7 @@
 		<layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
 			<jsonFormatter
 				class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-				<prettyPrint>false</prettyPrint>
+				<prettyPrint>true</prettyPrint>
 			</jsonFormatter>
 			<timestampFormat>dd.MM.yyyy' 'HH.mm.ss.SSS</timestampFormat>
 			<appendLineSeparator>true</appendLineSeparator>

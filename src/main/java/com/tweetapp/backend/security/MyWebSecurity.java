@@ -30,6 +30,10 @@ public class MyWebSecurity extends WebSecurityConfigurerAdapter {
 	    "/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/security", "/swagger-ui.html",
 	    "/webjars/**" };
 
+    private static final String[] CRITICAL_PATHS = {
+	    // ACTUATOR-URLS
+	    "/actuator/**" };
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 	auth.userDetailsService(userDetailService);
@@ -38,6 +42,7 @@ public class MyWebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 	http.authorizeRequests().antMatchers(WHITE_LIST).permitAll();
+	http.authorizeRequests().antMatchers(CRITICAL_PATHS).hasAnyRole("ROLE_ADMIN", "ADMIN");
 	http.authorizeRequests().anyRequest().authenticated();
 
 	// HTTP Security Customization
