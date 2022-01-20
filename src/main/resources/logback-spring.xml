@@ -1,30 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <configuration>
 
-	<appender name="Console"
+	<property resource="logback.properties" />
+
+	<appender name="ConsoleAppender"
 		class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
-			<jsonFormatter
-				class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-				<prettyPrint>true</prettyPrint>
-			</jsonFormatter>
-			<timestampFormat>dd.MM.yyyy' 'HH.mm.ss.SSS</timestampFormat>
-			<appendLineSeparator>true</appendLineSeparator>
-		</layout>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<customFields>${log.custom.field.app.name}</customFields>
+		</encoder>
 	</appender>
 
-	<!-- <appender name="Kafka" class="com.github.danielwegener.logback.kafka.KafkaAppender"> 
-		<encoder> <patternLayout class="ch.qos.logback.contrib.json.classic.JsonLayout"> 
-		<jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter"> 
-		<prettyPrint>false</prettyPrint> </jsonFormatter> <timestampFormat>dd.MM.yyyy' 
-		'HH.mm.ss.SSS</timestampFormat> </patternLayout> </encoder> <keyingStrategy 
-		class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" 
-		/> <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" 
-		/> <topic>logs</topic> <producerConfig>bootstrap.servers=localhost:9092</producerConfig> 
-		</appender> -->
+	<appender name="FileAppender"
+		class="ch.qos.logback.core.FileAppender">
+		<file>${log.file.location}</file>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<customFields>${log.custom.field.app.name}</customFields>
+		</encoder>
+	</appender>
 
-	<root level="info">
-		<appender-ref ref="Console" />
-		<!-- <appender-ref ref="Kafka" /> -->
+	<appender name="KafkaAppender"
+		class="com.github.danielwegener.logback.kafka.KafkaAppender">
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<customFields>${log.custom.field.app.name}</customFields>
+		</encoder>
+
+		<!-- Configure topics -->
+		<topic>${log.kafka.topic}</topic>
+
+		<keyingStrategy
+			class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />
+		<deliveryStrategy
+			class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+
+		<!-- Kafka producer configuration starts -->
+		<producerConfig>bootstrap.servers=${log.kafka.bootstrap.servers}</producerConfig>
+        <producerConfig>linger.ms=1000</producerConfig>
+        <!-- even if the producer buffer runs full, do not block the application but start to drop messages -->
+        <producerConfig>max.block.ms=0</producerConfig>
+		<!-- Kafka producer configuration ends -->
+
+	</appender>
+
+
+	<!-- Add all appenders -->
+	<root level="${log.level}">
+		<appender-ref ref="FileAppender" />
+
+		<if condition='isDefined("log.kafka.enable")'>
+			<then>
+				<if condition='property("log.kafka.enable").equals("true")'>
+					<then>
+						<appender-ref ref="KafkaAppender" />
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<appender-ref ref="ConsoleAppender" />
 	</root>
+
 </configuration>

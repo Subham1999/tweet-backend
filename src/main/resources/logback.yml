@@ -1,0 +1,17 @@
+baseDir: log
+log:
+  kafka:
+    topic: tblog
+    enable: 'false'
+    bootstrap:
+      servers: localhost:9092
+  file:
+    location: ${baseDir}/${app.name}-${app.version}.log
+  custom:
+    field:
+      app:
+        name: '{ "application" : "${app.name}-${app.version}" }'
+  level: INFO
+app:
+  name: tweet-app-backend
+  version: v1.0
