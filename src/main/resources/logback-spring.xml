@@ -34,10 +34,12 @@
 			class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
 
 		<!-- Kafka producer configuration starts -->
-		<producerConfig>bootstrap.servers=${log.kafka.bootstrap.servers}</producerConfig>
-        <producerConfig>linger.ms=1000</producerConfig>
-        <!-- even if the producer buffer runs full, do not block the application but start to drop messages -->
-        <producerConfig>max.block.ms=0</producerConfig>
+		<producerConfig>bootstrap.servers=${log.kafka.bootstrap.servers}
+		</producerConfig>
+		<producerConfig>linger.ms=1000</producerConfig>
+		<!-- even if the producer buffer runs full, do not block the application 
+			but start to drop messages -->
+		<producerConfig>max.block.ms=0</producerConfig>
 		<!-- Kafka producer configuration ends -->
 
 		<appender-ref ref="FileAppender" />
@@ -47,7 +49,6 @@
 	<!-- Add all appenders -->
 	<root level="${log.level}">
 		<appender-ref ref="FileAppender" />
-
 		<if condition='isDefined("log.kafka.enable")'>
 			<then>
 				<if condition='property("log.kafka.enable").equals("true")'>
@@ -57,7 +58,6 @@
 				</if>
 			</then>
 		</if>
-
 		<appender-ref ref="ConsoleAppender" />
 	</root>
 
