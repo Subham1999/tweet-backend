@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public ViewUserResponse viewUser(ViewUserRequest viewUserRequest) {	
+    public ViewUserResponse viewUser(ViewUserRequest viewUserRequest) {
 	LOGGER.info("Inside 'viewUser' User {}", viewUserRequest.getMail());
 	if (Objects.isNull(viewUserRequest)) {
 //	    return ViewUserResponse.builder()._status_code(STATUS_FAILED)._message(INVALID_ARGUMENT + viewUserRequest)

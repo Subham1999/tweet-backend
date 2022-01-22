@@ -45,8 +45,8 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
     private MyUserDetailService userDetailService;
 
     private static final String MDC_TOKEN = "req_id";
-    private static final String RESPONSE_HEADER = "X-tweet-app-res-ID";
-    private static final String REQUEST_HEADER = "X-tweet-app-req-ID";
+    private static final String RESPONSE_HEADER = "x-tweet-app-res-ID";
+    private static final String REQUEST_HEADER = "x-tweet-app-req-ID";
 
     @Autowired
     private Provider<HttpRequestDataHolder> provider;
@@ -62,8 +62,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 	    if (!StringUtils.isEmpty(REQUEST_HEADER) && !StringUtils.isEmpty(request.getHeader(REQUEST_HEADER))) {
 		token = request.getHeader(REQUEST_HEADER);
 	    } else {
-		token = Long.toHexString(System.currentTimeMillis()).concat(":")
-			.concat(UUID.randomUUID().toString().toUpperCase().replace("-", ""));
+		token = UUID.randomUUID().toString();
 	    }
 
 	    MDC.put(MDC_TOKEN, token);

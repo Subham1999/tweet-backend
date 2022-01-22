@@ -1,0 +1,13 @@
+FROM openjdk:11
+
+ENV APP_JAR_NAME=tweet-backend-0.0.1-SNAPSHOT
+ENV SERVER_PORT=8080
+ENV WORK_DIRECTORY=/opt/app/docker_images
+
+COPY ./target/${APP_JAR_NAME}.jar ${WORK_DIRECTORY}/${APP_JAR_NAME}.jar
+
+WORKDIR ${WORK_DIRECTORY}
+
+EXPOSE ${SERVER_PORT}
+
+CMD [ "java" , "-jar", "${APP_JAR_NAME}" ]
