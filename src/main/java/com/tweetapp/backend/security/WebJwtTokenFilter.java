@@ -105,6 +105,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 			: "Internal Server error";
 		LOGGER.error("#################### USER NOT Validated because {}", issue);
 	    }
+	    response.setHeader("Access-Control-Expose-Headers", RESPONSE_HEADER);
 	    filterChain.doFilter(request, response);
 	} catch (Exception e) {
 	    LOGGER.error("Exception at 'WebJwtTokenFilter' : {}", ExceptionUtils.getStackTrace(e));
