@@ -26,8 +26,8 @@ import com.tweetapp.backend.dto.auth.AuthResponse;
 @AutoConfigureMockMvc
 class RestUserControllerTest {
 
-    private static final String TESTER_PASSWORD = "abcd";
-    private static final String TESTER_MAIL = "subham4@gmail.com";
+    private static final String TESTER_PASSWORD = "changeit";
+    private static final String TESTER_MAIL = "subham.santra@cognizant.com";
 
     @Autowired
     private MockMvc mockMvc;
@@ -99,10 +99,10 @@ class RestUserControllerTest {
 	mockMvc.perform(get("/users/{email}", "no_such_mail@gmail.com").headers(headers())).andExpect(status().is(452));
     }
 
-    @Test
-    void testUpdateUser() throws Exception {
-	mockMvc.perform(get("/users/{email}", "subham4@gmail.com").headers(headers())).andExpect(status().is(200));
-    }
+//    @Test
+//    void testUpdateUser() throws Exception {
+//	mockMvc.perform(get("/users/{email}", "subham.santra@gmail.com").headers(headers())).andExpect(status().is(200));
+//    }
 
 //    @Test
 //    void testStoreSecrets() {

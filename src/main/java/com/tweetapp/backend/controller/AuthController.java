@@ -85,9 +85,6 @@ public class AuthController {
 
     private UserDetails createTmpUser(final String email, final String password) {
 	final List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("USER"));
-	if (email.equals(adminEmail)) {
-	    authorities.add(new SimpleGrantedAuthority("ADMIN"));
-	}
 	return User.withUsername(email).password(password).authorities(authorities).build();
     }
 
