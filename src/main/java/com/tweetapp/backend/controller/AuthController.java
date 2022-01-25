@@ -121,8 +121,14 @@ public class AuthController {
 		    throw new InvalidRequest("Exception :: ", e);
 		}
 	    } else {
-		LOGGER.error("User email: {} --secret is not matching", email);
-		throw new InvalidRequest("Invalid REQUIRED user secret");
+		String errMsg;
+		if (optionalSecret.isEmpty()) {
+		    errMsg = String.format("User : %s has not shared secret as of now!", email);
+		} else {
+		    errMsg = String.format("User email: %s secret is not matching", email);
+		}
+		LOGGER.error(errMsg);
+		throw new InvalidRequest(errMsg);
 	    }
 	} else {
 	    LOGGER.error("User email: {} is not registered..", email);
