@@ -1,5 +1,8 @@
 package com.tweetapp.backend.security;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,6 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 
 import com.tweetapp.backend.controller.MyAuthenticationEntrypoint;
@@ -47,7 +53,8 @@ public class MyWebSecurity extends WebSecurityConfigurerAdapter {
 
 	// HTTP Security Customization
 	http.cors();
-	http.csrf().disable();
+//	http.csrf().disable();
+	http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 	http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 	http.exceptionHandling().authenticationEntryPoint(new MyAuthenticationEntrypoint());

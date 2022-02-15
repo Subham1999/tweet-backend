@@ -2,20 +2,52 @@
 
 <configuration>
 
+	<timestamp key="BY_SECOND" datePattern="yyyyMMdd'T'HHmmss" />
+
 	<property resource="logback.properties" />
 
 	<appender name="ConsoleAppender"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
 			<customFields>${log.custom.field.app.name}</customFields>
+			<fieldNames>
+				<timestamp>timestamp</timestamp>
+				<version>[ignore]</version>
+				<levelValue>[ignore]</levelValue>
+				<logger>logger</logger>
+				<thread>thread</thread>
+			</fieldNames>
 		</encoder>
 	</appender>
 
 	<appender name="FileAppender"
-		class="ch.qos.logback.core.FileAppender">
-		<file>${log.file.location}</file>
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		
+		<!-- ACTIVE OUTPUT TARGET -->
+		<file>${baseDir}/${app.name}-${app.version}.log</file>
+		
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- ARCHIVED LOG FILES -->
+			<fileNamePattern>
+				${baseDir}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.log
+			</fileNamePattern>
+			
+			<maxFileSize>200KB</maxFileSize>
+			<maxHistory>1</maxHistory>
+			<totalSizeCap>1MB</totalSizeCap>
+		</rollingPolicy>
+
+		<append>true</append>
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
 			<customFields>${log.custom.field.app.name}</customFields>
+			<fieldNames>
+				<timestamp>timestamp</timestamp>
+				<version>[ignore]</version>
+				<levelValue>[ignore]</levelValue>
+				<logger>logger</logger>
+				<thread>thread</thread>
+			</fieldNames>
 		</encoder>
 	</appender>
 
@@ -23,6 +55,13 @@
 		class="com.github.danielwegener.logback.kafka.KafkaAppender">
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
 			<customFields>${log.custom.field.app.name}</customFields>
+			<fieldNames>
+				<timestamp>timestamp</timestamp>
+				<version>[ignore]</version>
+				<levelValue>[ignore]</levelValue>
+				<logger>logger</logger>
+				<thread>thread</thread>
+			</fieldNames>
 		</encoder>
 
 		<!-- Configure topics -->
