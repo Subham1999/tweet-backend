@@ -21,19 +21,19 @@ import io.jsonwebtoken.ExpiredJwtException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(
-	    final MethodArgumentNotValidException exception) {
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(
+			final MethodArgumentNotValidException exception) {
 
-	LOGGER.error("Handling MethodArgumentNotValidException msg:{}", exception.getMessage());
-	String message = exception.getMessage();
-	List<ObjectError> allErrors = exception.getAllErrors();
-	Map<String, Object> map = Map.of("err-message", (Object) message, "errors", (Object) allErrors);
+		LOGGER.error("Handling MethodArgumentNotValidException msg:{}", exception.getMessage());
+		String message = exception.getMessage();
+		List<ObjectError> allErrors = exception.getAllErrors();
+		Map<String, Object> map = Map.of("err-message", (Object) message, "errors", (Object) allErrors);
 
-	return ResponseEntity.status(465).body(map);
-    }
+		return ResponseEntity.status(465).body(map);
+	}
 
 //    @ExceptionHandler(InvalidRequest.class)
 //    public ResponseEntity<Map<String, Object>> handleInvalidRequest(final InvalidRequest exception) {
@@ -43,29 +43,29 @@ public class GlobalExceptionHandler {
 //	return ResponseEntity.status(465).body(map);
 //    }
 //    
-    @ExceptionHandler(value = { HttpMessageNotReadableException.class, PasswordMismatchException.class,
-	    ExpiredJwtException.class, InternalServerException.class, InvalidRequest.class })
-    public ResponseEntity<Map<String, Object>> handleApplicationRuntimeExceptions(final RuntimeException exception) {
+	@ExceptionHandler(value = { HttpMessageNotReadableException.class, PasswordMismatchException.class,
+			ExpiredJwtException.class, InternalServerException.class, InvalidRequest.class })
+	public ResponseEntity<Map<String, Object>> handleApplicationRuntimeExceptions(final RuntimeException exception) {
 
-	LOGGER.error("Handling RuntimeException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
-	String message = exception.getMessage();
-	Map<String, Object> map = Map.of("err-message", message);
-	int statusCode = 452;
+		LOGGER.error("Handling RuntimeException::{} msg:{}", exception.getClass().getName(), exception.getMessage());
+		String message = exception.getMessage();
+		Map<String, Object> map = Map.of("err-message", message);
+		int statusCode = 452;
 
-	if (exception instanceof ExpiredJwtException) {
-	    statusCode = 460;
+		if (exception instanceof ExpiredJwtException) {
+			statusCode = 460;
+		}
+
+		return ResponseEntity.status(statusCode).body(map);
 	}
 
-	return ResponseEntity.status(statusCode).body(map);
-    }
+	@ExceptionHandler(NullPointerException.class)
+	public ResponseEntity<Map<String, Object>> handleNullPointerException(final NullPointerException exception) {
+		String message = exception.getMessage();
+		LOGGER.error("Handling NullPointerException::{} msg:{}", exception.getClass().getName(),
+				exception.getMessage());
+		Map<String, Object> map = Map.of("err-message", message);
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Map<String, Object>> handleNullPointerException(final NullPointerException exception) {
-	String message = exception.getMessage();
-	LOGGER.error("Handling NullPointerException::{} msg:{}", exception.getClass().getName(),
-		exception.getMessage());
-	Map<String, Object> map = Map.of("err-message", message);
-
-	return ResponseEntity.status(466).body(map);
-    }
+		return ResponseEntity.status(466).body(map);
+	}
 }

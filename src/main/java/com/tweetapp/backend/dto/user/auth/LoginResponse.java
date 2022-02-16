@@ -12,5 +12,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class LoginResponse extends Response {
-    private String message;
+	private String message;
 }

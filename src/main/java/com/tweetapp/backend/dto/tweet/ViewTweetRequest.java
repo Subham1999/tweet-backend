@@ -20,6 +20,6 @@ import lombok.Data;
 @Data
 @Builder
 public class ViewTweetRequest {
-    private String tweetId;
-    private String createdBy;
+	private String tweetId;
+	private String createdBy;
 }

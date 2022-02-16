@@ -18,36 +18,36 @@ import lombok.Data;
 
 public class MyAuthenticationEntrypoint implements AuthenticationEntryPoint {
 
-    private static final int AUTH_ERR = 460;
+	private static final int AUTH_ERR = 460;
 //    private static final String ERROR_RESPONSE = "Authentication Exception";
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response,
-	    AuthenticationException authException) throws IOException, ServletException {
+	@Override
+	public void commence(HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException authException) throws IOException, ServletException {
 
-	RootCause root_cause = RootCause.builder().root_cause(ExceptionUtils.getStackTrace(authException))
-		.message(ExceptionUtils.getMessage(authException)).build();
+		RootCause root_cause = RootCause.builder().root_cause(ExceptionUtils.getStackTrace(authException))
+				.message(ExceptionUtils.getMessage(authException)).build();
 
-	String jsonCause = OBJECT_MAPPER.writeValueAsString(root_cause);
+		String jsonCause = OBJECT_MAPPER.writeValueAsString(root_cause);
 
-	response.setStatus(AUTH_ERR);
-	PrintWriter writer = response.getWriter();
-	writer.append(jsonCause);
-	writer.close();
-	response.flushBuffer();
-    }
+		response.setStatus(AUTH_ERR);
+		PrintWriter writer = response.getWriter();
+		writer.append(jsonCause);
+		writer.close();
+		response.flushBuffer();
+	}
 
 }
 
 @Data
 @Builder
 class RootCause {
-    public static String getType() {
-	return type;
-    }
+	public static String getType() {
+		return type;
+	}
 
-    private static final String type = "Authentication Exception";
-    private String root_cause;
-    private String message;
+	private static final String type = "Authentication Exception";
+	private String root_cause;
+	private String message;
 }

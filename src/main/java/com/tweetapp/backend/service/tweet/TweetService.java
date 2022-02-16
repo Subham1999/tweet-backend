@@ -20,21 +20,21 @@ import com.tweetapp.backend.models.Tweet;
 
 public interface TweetService {
 
-    CreateTweetResponse createTweet(final CreateTweetRequest createTweetRequest);
+	CreateTweetResponse createTweet(final CreateTweetRequest createTweetRequest);
 
-    UpdateTweetResponse updateTweet(final UpdateTweetRequest updateTweetRequest);
+	UpdateTweetResponse updateTweet(final UpdateTweetRequest updateTweetRequest);
 
-    DeleteTweetResponse deleteTweet(final DeleteTweetRequest deleteTweetRequest);
+	DeleteTweetResponse deleteTweet(final DeleteTweetRequest deleteTweetRequest);
 
-    LikeTweetResponse likeOnTweet(final LikeTweetRequest likeTweetRequest);
+	LikeTweetResponse likeOnTweet(final LikeTweetRequest likeTweetRequest);
 
-    DeleteLikeResponse deleteLikeOnTweet(final DeleteLikeRequest deleteLikeRequest);
+	DeleteLikeResponse deleteLikeOnTweet(final DeleteLikeRequest deleteLikeRequest);
 
-    ReplyTweetResponse replyOnTweet(final ReplyTweetRequest replyTweetRequest);
+	ReplyTweetResponse replyOnTweet(final ReplyTweetRequest replyTweetRequest);
 
-    DeleteReplyResponse deleteReplyOnTweet(final DeleteReplyRequest deleteReplyRequest);
+	DeleteReplyResponse deleteReplyOnTweet(final DeleteReplyRequest deleteReplyRequest);
 
-    Page<Tweet> viewTweets(final TweetViewConfig tweetViewConfig);
+	Page<Tweet> viewTweets(final TweetViewConfig tweetViewConfig);
 
-    Tweet getOne(String tweet_id);
+	Tweet getOne(String tweet_id);
 }

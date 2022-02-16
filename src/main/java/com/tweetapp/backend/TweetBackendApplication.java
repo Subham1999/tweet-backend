@@ -28,37 +28,37 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableWebSecurity
 public class TweetBackendApplication {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TweetBackendApplication.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TweetBackendApplication.class);
 
-    public static void main(String[] args) {
-	LOGGER.info("TweetBackendApplication starting...");
-	SpringApplication.run(TweetBackendApplication.class, args);
-    }
+	public static void main(String[] args) {
+		LOGGER.info("TweetBackendApplication starting...");
+		SpringApplication.run(TweetBackendApplication.class, args);
+	}
 
-    @Autowired
-    private SwaggerConfigProps configProps;
+	@Autowired
+	private SwaggerConfigProps configProps;
 
-    @Bean
-    public Docket postsApi() {
-	return new Docket(DocumentationType.SWAGGER_2).groupName(configProps.getGroup_name()).apiInfo(apiInfo())
-		.select().paths(postPaths()).build();
-    }
+	@Bean
+	public Docket postsApi() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName(configProps.getGroup_name()).apiInfo(apiInfo())
+				.select().paths(postPaths()).build();
+	}
 
-    private Predicate<String> postPaths() {
-	return regex(configProps.getApi_regex());
-    }
+	private Predicate<String> postPaths() {
+		return regex(configProps.getApi_regex());
+	}
 
-    private ApiInfo apiInfo() {
-	return new ApiInfoBuilder().title(configProps.getTitle()).description(configProps.getDescription())
-		.contact(new Contact(configProps.getContact_name(), configProps.getContact_url(),
-			configProps.getContact_email()))
-		.license(configProps.getLicense()).licenseUrl(configProps.getLicense_url())
-		.version(configProps.getVersion()).build();
-    }
+	private ApiInfo apiInfo() {
+		return new ApiInfoBuilder().title(configProps.getTitle()).description(configProps.getDescription())
+				.contact(new Contact(configProps.getContact_name(), configProps.getContact_url(),
+						configProps.getContact_email()))
+				.license(configProps.getLicense()).licenseUrl(configProps.getLicense_url())
+				.version(configProps.getVersion()).build();
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-	LOGGER.info("PasswordEncoder Bean method invoked");
-	return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		LOGGER.info("PasswordEncoder Bean method invoked");
+		return new BCryptPasswordEncoder();
+	}
 }

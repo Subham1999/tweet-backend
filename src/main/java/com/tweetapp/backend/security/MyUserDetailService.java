@@ -16,18 +16,18 @@ import com.tweetapp.backend.models.User;
 @Component
 public class MyUserDetailService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
-	final Optional<User> optionalUser = userRepository.findByEmail(email);
-	if (optionalUser.isEmpty()) {
-	    throw new UsernameNotFoundException("user email is not registered : " + email);
+	@Override
+	public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+		final Optional<User> optionalUser = userRepository.findByEmail(email);
+		if (optionalUser.isEmpty()) {
+			throw new UsernameNotFoundException("user email is not registered : " + email);
+		}
+		User user = optionalUser.get();
+		return org.springframework.security.core.userdetails.User.withUsername(email).password(user.getPassword())
+				.authorities(List.of(new SimpleGrantedAuthority("USER"))).build();
 	}
-	User user = optionalUser.get();
-	return org.springframework.security.core.userdetails.User.withUsername(email).password(user.getPassword())
-		.authorities(List.of(new SimpleGrantedAuthority("USER"))).build();
-    }
 
 }

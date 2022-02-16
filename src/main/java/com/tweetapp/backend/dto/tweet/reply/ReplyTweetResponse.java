@@ -12,5 +12,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ReplyTweetResponse extends Response {
 
-    private List<Reply> replies;
+	private List<Reply> replies;
 }

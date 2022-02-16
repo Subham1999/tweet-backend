@@ -50,109 +50,109 @@ import io.swagger.annotations.ApiOperation;
 @CrossOrigin
 public class RestTweetController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestTweetController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RestTweetController.class);
 
-    @Autowired
-    private TweetService tweetService;
+	@Autowired
+	private TweetService tweetService;
 
-    @GetMapping("/hello")
-    public String hello() {
-	LOGGER.info("Inside 'hello'");
-	return "Hello";
-    }
-
-    @PostMapping
-    public CreateTweetResponse postNewTweet(@RequestBody CreateTweetRequest createTweetRequest) {
-	LOGGER.info("Inside 'postNewTweet'");
-	return tweetService.createTweet(createTweetRequest);
-    }
-
-    @GetMapping("/search")
-    public Page<Tweet> searchTweets(@RequestParam(required = false, name = "created_by") String createdBy,
-	    @RequestParam(required = false, defaultValue = "globalFeed") String fetchType,
-	    @RequestParam(required = false, defaultValue = "0") Integer pageOffset,
-	    @RequestParam(required = false, defaultValue = "10") Integer pageLength,
-	    @RequestParam(required = false, defaultValue = "createdAt_DESCENDING") String[] sortBy) {
-
-	LOGGER.info("Inside 'searchTweets', CreatedBy {}, fetchType {}, pageOffset {}, pageLength {}", createdBy,
-		fetchType, pageOffset, pageLength);
-
-	TweetFetchType tweetFetchType;
-
-	if (StringUtils.equalsIgnoreCase(fetchType, "globalfeed")) {
-	    tweetFetchType = TweetFetchType.GLOBAL_FEED;
-	} else if (StringUtils.equalsIgnoreCase(fetchType, "mostlikes")) {
-	    tweetFetchType = TweetFetchType.MOST_LIKE;
-	} else if (StringUtils.equalsIgnoreCase(fetchType, "recentposts")) {
-	    tweetFetchType = TweetFetchType.RECENT_POSTS;
-	} else {
-	    tweetFetchType = TweetFetchType.GLOBAL_FEED;
+	@GetMapping("/hello")
+	public String hello() {
+		LOGGER.info("Inside 'hello'");
+		return "Hello";
 	}
 
-	Map<TweetViewConfigConstant, Object> map = new HashMap<>();
-
-	if (!tweetFetchType.equals(TweetFetchType.GLOBAL_FEED)) {
-	    map.put(TweetViewConfigConstant.AUTHOR_NAME, createdBy);
+	@PostMapping
+	public CreateTweetResponse postNewTweet(@RequestBody CreateTweetRequest createTweetRequest) {
+		LOGGER.info("Inside 'postNewTweet'");
+		return tweetService.createTweet(createTweetRequest);
 	}
 
-	return tweetService.viewTweets(new TweetViewConfig() {
-	    @Override
-	    public Pageable getPageRequest() {
-		final List<Order> orders = new ArrayList<>();
-		for (final String sortByParam : sortBy) {
-		    if (sortByParam.endsWith("_DESCENDING")) {
-			orders.add(Order.desc(sortByParam.split("_DESCENDING")[0]));
-		    } else {
-			orders.add(Order.asc(sortByParam));
-		    }
+	@GetMapping("/search")
+	public Page<Tweet> searchTweets(@RequestParam(required = false, name = "created_by") String createdBy,
+			@RequestParam(required = false, defaultValue = "globalFeed") String fetchType,
+			@RequestParam(required = false, defaultValue = "0") Integer pageOffset,
+			@RequestParam(required = false, defaultValue = "10") Integer pageLength,
+			@RequestParam(required = false, defaultValue = "createdAt_DESCENDING") String[] sortBy) {
+
+		LOGGER.info("Inside 'searchTweets', CreatedBy {}, fetchType {}, pageOffset {}, pageLength {}", createdBy,
+				fetchType, pageOffset, pageLength);
+
+		TweetFetchType tweetFetchType;
+
+		if (StringUtils.equalsIgnoreCase(fetchType, "globalfeed")) {
+			tweetFetchType = TweetFetchType.GLOBAL_FEED;
+		} else if (StringUtils.equalsIgnoreCase(fetchType, "mostlikes")) {
+			tweetFetchType = TweetFetchType.MOST_LIKE;
+		} else if (StringUtils.equalsIgnoreCase(fetchType, "recentposts")) {
+			tweetFetchType = TweetFetchType.RECENT_POSTS;
+		} else {
+			tweetFetchType = TweetFetchType.GLOBAL_FEED;
 		}
-		final PageRequest pageRequest = PageRequest.of(pageOffset, pageLength, Sort.by(orders));
-		return pageRequest;
-	    }
 
-	    @Override
-	    public Map<TweetViewConfigConstant, Object> getConfigMap() {
-		return map;
-	    }
+		Map<TweetViewConfigConstant, Object> map = new HashMap<>();
 
-	    @Override
-	    public TweetFetchType fetchType() {
-		return tweetFetchType;
-	    }
-	});
-    }
+		if (!tweetFetchType.equals(TweetFetchType.GLOBAL_FEED)) {
+			map.put(TweetViewConfigConstant.AUTHOR_NAME, createdBy);
+		}
 
-    @GetMapping("/{tweet_id}")
-    public Tweet getOne(@PathVariable String tweet_id) {
-	LOGGER.info("Inside 'getOne'");
-	return tweetService.getOne(tweet_id);
-    }
+		return tweetService.viewTweets(new TweetViewConfig() {
+			@Override
+			public Pageable getPageRequest() {
+				final List<Order> orders = new ArrayList<>();
+				for (final String sortByParam : sortBy) {
+					if (sortByParam.endsWith("_DESCENDING")) {
+						orders.add(Order.desc(sortByParam.split("_DESCENDING")[0]));
+					} else {
+						orders.add(Order.asc(sortByParam));
+					}
+				}
+				final PageRequest pageRequest = PageRequest.of(pageOffset, pageLength, Sort.by(orders));
+				return pageRequest;
+			}
 
-    @PutMapping("/{tweet_id}")
-    @ApiOperation(value = "Updates a tweet", notes = "Updates an already created tweet. tweet author and updator should be same user!!")
-    public UpdateTweetResponse updateOne(@PathVariable String tweet_id,
-	    @RequestBody UpdateTweetRequest updateTweetRequest) {
-	LOGGER.info("Inside 'updateOne...' tweet_id : {}", tweet_id);
-	return tweetService.updateTweet(updateTweetRequest);
-    }
+			@Override
+			public Map<TweetViewConfigConstant, Object> getConfigMap() {
+				return map;
+			}
 
-    @PostMapping("/reply")
-    public ResponseEntity<Object> replyOnPost(@RequestBody @Valid ReplyTweetRequest replyTweetRequest) {
-	LOGGER.info("Inside 'replyOnPost'");
-	ReplyTweetResponse replyTweetResponse = tweetService.replyOnTweet(replyTweetRequest);
-	return ResponseEntity.ok(replyTweetResponse);
-    }
+			@Override
+			public TweetFetchType fetchType() {
+				return tweetFetchType;
+			}
+		});
+	}
 
-    @PostMapping("/like")
-    public LikeTweetResponse likeOnPost(@RequestBody @Valid LikeTweetRequest likeTweetRequest) {
-	LOGGER.info("Inside 'likeOnPost'");
-	return tweetService.likeOnTweet(likeTweetRequest);
-    }
+	@GetMapping("/{tweet_id}")
+	public Tweet getOne(@PathVariable String tweet_id) {
+		LOGGER.info("Inside 'getOne'");
+		return tweetService.getOne(tweet_id);
+	}
 
-    @PostMapping("/dislike")
-    public DeleteLikeResponse dislikeOnPost(@RequestBody @Valid DeleteLikeRequest deleteLikeRequest) {
-	LOGGER.info("Inside 'dislikeOnPost'");
-	return tweetService.deleteLikeOnTweet(deleteLikeRequest);
-    }
+	@PutMapping("/{tweet_id}")
+	@ApiOperation(value = "Updates a tweet", notes = "Updates an already created tweet. tweet author and updator should be same user!!")
+	public UpdateTweetResponse updateOne(@PathVariable String tweet_id,
+			@RequestBody UpdateTweetRequest updateTweetRequest) {
+		LOGGER.info("Inside 'updateOne...' tweet_id : {}", tweet_id);
+		return tweetService.updateTweet(updateTweetRequest);
+	}
+
+	@PostMapping("/reply")
+	public ResponseEntity<Object> replyOnPost(@RequestBody @Valid ReplyTweetRequest replyTweetRequest) {
+		LOGGER.info("Inside 'replyOnPost'");
+		ReplyTweetResponse replyTweetResponse = tweetService.replyOnTweet(replyTweetRequest);
+		return ResponseEntity.ok(replyTweetResponse);
+	}
+
+	@PostMapping("/like")
+	public LikeTweetResponse likeOnPost(@RequestBody @Valid LikeTweetRequest likeTweetRequest) {
+		LOGGER.info("Inside 'likeOnPost'");
+		return tweetService.likeOnTweet(likeTweetRequest);
+	}
+
+	@PostMapping("/dislike")
+	public DeleteLikeResponse dislikeOnPost(@RequestBody @Valid DeleteLikeRequest deleteLikeRequest) {
+		LOGGER.info("Inside 'dislikeOnPost'");
+		return tweetService.deleteLikeOnTweet(deleteLikeRequest);
+	}
 
 }

@@ -40,225 +40,225 @@ import com.tweetapp.backend.service.user.UserService;
 @Service
 public class TweetServiceImpl implements TweetService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TweetServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TweetServiceImpl.class);
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private TweetRepository tweetRepository;
+	@Autowired
+	private TweetRepository tweetRepository;
 
-    @Autowired
-    private TweetFetchService tweetFetchService;
+	@Autowired
+	private TweetFetchService tweetFetchService;
 
-    @Autowired
-    private Provider<HttpRequestDataHolder> provider;
+	@Autowired
+	private Provider<HttpRequestDataHolder> provider;
 
-    @Override
-    public CreateTweetResponse createTweet(CreateTweetRequest createTweetRequest) {
-	LOGGER.info("Inside 'createTweet'");
-	final String createdByEmail = createTweetRequest.getCreatedBy();
+	@Override
+	public CreateTweetResponse createTweet(CreateTweetRequest createTweetRequest) {
+		LOGGER.info("Inside 'createTweet'");
+		final String createdByEmail = createTweetRequest.getCreatedBy();
 
-	if (userService.userExists(createdByEmail)) {
-	    LOGGER.info("CreatedBy -User {} exists", createdByEmail);
+		if (userService.userExists(createdByEmail)) {
+			LOGGER.info("CreatedBy -User {} exists", createdByEmail);
 
-	    final Tweet tweet = Tweet.builder().createdBy(createTweetRequest.getCreatedBy())
-		    .content(createTweetRequest.getContent()).createdAt(new Date()).likes(new LinkedHashSet<>())
-		    .replies(new LinkedList<>()).build();
+			final Tweet tweet = Tweet.builder().createdBy(createTweetRequest.getCreatedBy())
+					.content(createTweetRequest.getContent()).createdAt(new Date()).likes(new LinkedHashSet<>())
+					.replies(new LinkedList<>()).build();
 
-	    final Tweet savedTweet = tweetRepository.save(tweet);
-	    LOGGER.info("Tweet saved tweetId {}", savedTweet.getId());
+			final Tweet savedTweet = tweetRepository.save(tweet);
+			LOGGER.info("Tweet saved tweetId {}", savedTweet.getId());
 
-	    return CreateTweetResponse.builder().createdAt(savedTweet.getCreatedAt()).content(savedTweet.getContent())
-		    .createdBy(savedTweet.getCreatedBy()).id(savedTweet.getId()).build();
+			return CreateTweetResponse.builder().createdAt(savedTweet.getCreatedAt()).content(savedTweet.getContent())
+					.createdBy(savedTweet.getCreatedBy()).id(savedTweet.getId()).build();
 
-	} else {
-	    String message = "Author email id : " + createdByEmail + " is absent or misspelled";
-	    LOGGER.error(message);
-	    throw new InvalidRequest(message);
+		} else {
+			String message = "Author email id : " + createdByEmail + " is absent or misspelled";
+			LOGGER.error(message);
+			throw new InvalidRequest(message);
+		}
+
 	}
 
-    }
+	@Override
+	public UpdateTweetResponse updateTweet(UpdateTweetRequest updateTweetRequest) {
+		String id = updateTweetRequest.getId();
+		String new_content = updateTweetRequest.getNew_content();
+		LOGGER.info("Inside 'updateTweet'... tweet ID : {}", id);
+		final String userEmail = provider.get().getUser();
 
-    @Override
-    public UpdateTweetResponse updateTweet(UpdateTweetRequest updateTweetRequest) {
-	String id = updateTweetRequest.getId();
-	String new_content = updateTweetRequest.getNew_content();
-	LOGGER.info("Inside 'updateTweet'... tweet ID : {}", id);
-	final String userEmail = provider.get().getUser();
+		Optional<Tweet> optional = tweetRepository.findById(id);
+		if (optional.isPresent()) {
+			LOGGER.info("Tweet found updating!!");
+			final Tweet tweet = optional.get();
 
-	Optional<Tweet> optional = tweetRepository.findById(id);
-	if (optional.isPresent()) {
-	    LOGGER.info("Tweet found updating!!");
-	    final Tweet tweet = optional.get();
+			if (!tweet.getCreatedBy().equals(userEmail)) {
+				LOGGER.error("Tweet id {} is created by {}!!!! SO other user can not update!!", id,
+						tweet.getCreatedBy());
+				throw new InvalidRequest("Tweet is created by " + tweet.getCreatedBy());
+			}
 
-	    if (!tweet.getCreatedBy().equals(userEmail)) {
-		LOGGER.error("Tweet id {} is created by {}!!!! SO other user can not update!!", id,
-			tweet.getCreatedBy());
-		throw new InvalidRequest("Tweet is created by " + tweet.getCreatedBy());
-	    }
-
-	    tweet.setContent(new_content);
-	    tweet.setUpdatedAt(new Date());
-	    final Tweet tweet2 = tweetRepository.save(tweet);
-	    LOGGER.info("Tweet updated!!");
-	    return UpdateTweetResponse.builder().tweet(tweet2).build();
-	} else {
-	    LOGGER.error("Tweet NOT founf for ID : {}", id);
-	    throw new InvalidRequest("Invalid tweet id : " + id + " !!");
-	}
-    }
-
-    @Override
-    public DeleteTweetResponse deleteTweet(DeleteTweetRequest deleteTweetRequest) {
-	return null;
-    }
-
-    @Override
-    public LikeTweetResponse likeOnTweet(LikeTweetRequest likeTweetRequest) {
-	Objects.requireNonNull(likeTweetRequest);
-
-	LOGGER.info("Inside 'likeOnTweet' postId:{}... likerId:{}", likeTweetRequest.getPostId(),
-		likeTweetRequest.getLikerId());
-
-	String postId = likeTweetRequest.getPostId();
-	String likedBy = likeTweetRequest.getLikerId();
-
-	if (!tweetExists(postId)) {
-	    String msg = "Post Id : " + postId + " doesn't exists";
-	    LOGGER.error(msg);
-	    throw new InvalidRequest(msg);
-	}
-	if (!userExists(likedBy)) {
-	    String msg = "No user with email : " + likedBy + " exist";
-	    LOGGER.error(msg);
-	    throw new InvalidRequest(msg);
+			tweet.setContent(new_content);
+			tweet.setUpdatedAt(new Date());
+			final Tweet tweet2 = tweetRepository.save(tweet);
+			LOGGER.info("Tweet updated!!");
+			return UpdateTweetResponse.builder().tweet(tweet2).build();
+		} else {
+			LOGGER.error("Tweet NOT founf for ID : {}", id);
+			throw new InvalidRequest("Invalid tweet id : " + id + " !!");
+		}
 	}
 
-	final Tweet tweet = tweetRepository.findById(postId).get();
-	Date likedDate = likeTweetRequest.getLikedDate();
-	tweet.getLikes().add(
-		Like.builder().likedDate(Objects.isNull(likedDate) ? new Date() : likedDate).likerId(likedBy).build());
-	tweetRepository.save(tweet);
-	LOGGER.info("Liked on post:{}", postId);
-	LinkedHashSet<Like> likes = tweet.getLikes();
-	return LikeTweetResponse.builder().likes(likes).build();
-    }
-
-    @Override
-    public DeleteLikeResponse deleteLikeOnTweet(DeleteLikeRequest deleteLikeRequest) {
-	Objects.requireNonNull(deleteLikeRequest);
-	LOGGER.info("Inside 'deleteLikeOnTweet'... Post ID:{} Liker :{}", deleteLikeRequest.getPostId(),
-		deleteLikeRequest.getLikedBy());
-	final String postId = deleteLikeRequest.getPostId();
-	final String likedBy = deleteLikeRequest.getLikedBy();
-
-	if (!tweetExists(postId)) {
-	    String msg = "Post Id : " + postId + " doesn't exists";
-	    LOGGER.error(msg);
-	    throw new InvalidRequest(msg);
-	}
-	if (!userExists(likedBy)) {
-	    String msg = "No user with email : " + likedBy + " exist";
-	    LOGGER.error(msg);
-	    throw new InvalidRequest(msg);
+	@Override
+	public DeleteTweetResponse deleteTweet(DeleteTweetRequest deleteTweetRequest) {
+		return null;
 	}
 
-	final Like like = Like.builder().likerId(likedBy).likedDate(null).build();
-	final Tweet tweet = tweetRepository.findById(postId).get();
-	final LinkedHashSet<Like> likes = tweet.getLikes();
+	@Override
+	public LikeTweetResponse likeOnTweet(LikeTweetRequest likeTweetRequest) {
+		Objects.requireNonNull(likeTweetRequest);
 
-	if (likes.contains(like)) {
-	    likes.remove(like);
-	    tweetRepository.save(tweet);
-	} else {
-	    // Nothing TODO
+		LOGGER.info("Inside 'likeOnTweet' postId:{}... likerId:{}", likeTweetRequest.getPostId(),
+				likeTweetRequest.getLikerId());
+
+		String postId = likeTweetRequest.getPostId();
+		String likedBy = likeTweetRequest.getLikerId();
+
+		if (!tweetExists(postId)) {
+			String msg = "Post Id : " + postId + " doesn't exists";
+			LOGGER.error(msg);
+			throw new InvalidRequest(msg);
+		}
+		if (!userExists(likedBy)) {
+			String msg = "No user with email : " + likedBy + " exist";
+			LOGGER.error(msg);
+			throw new InvalidRequest(msg);
+		}
+
+		final Tweet tweet = tweetRepository.findById(postId).get();
+		Date likedDate = likeTweetRequest.getLikedDate();
+		tweet.getLikes().add(
+				Like.builder().likedDate(Objects.isNull(likedDate) ? new Date() : likedDate).likerId(likedBy).build());
+		tweetRepository.save(tweet);
+		LOGGER.info("Liked on post:{}", postId);
+		LinkedHashSet<Like> likes = tweet.getLikes();
+		return LikeTweetResponse.builder().likes(likes).build();
 	}
 
-	return DeleteLikeResponse.builder().likes(likes).build();
-    }
+	@Override
+	public DeleteLikeResponse deleteLikeOnTweet(DeleteLikeRequest deleteLikeRequest) {
+		Objects.requireNonNull(deleteLikeRequest);
+		LOGGER.info("Inside 'deleteLikeOnTweet'... Post ID:{} Liker :{}", deleteLikeRequest.getPostId(),
+				deleteLikeRequest.getLikedBy());
+		final String postId = deleteLikeRequest.getPostId();
+		final String likedBy = deleteLikeRequest.getLikedBy();
 
-    @Override
-    public ReplyTweetResponse replyOnTweet(ReplyTweetRequest replyTweetRequest) {
-	Objects.requireNonNull(replyTweetRequest);
-	LOGGER.info("Inside 'replyOnTweet'... Post Id {} Replied By {}", replyTweetRequest.getPostId(),
-		replyTweetRequest.getRepliedBy());
+		if (!tweetExists(postId)) {
+			String msg = "Post Id : " + postId + " doesn't exists";
+			LOGGER.error(msg);
+			throw new InvalidRequest(msg);
+		}
+		if (!userExists(likedBy)) {
+			String msg = "No user with email : " + likedBy + " exist";
+			LOGGER.error(msg);
+			throw new InvalidRequest(msg);
+		}
 
-	String postId = replyTweetRequest.getPostId();
-	if (!tweetExists(postId)) {
-	    String msg = "Post Id : " + postId + " doesn't exists";
-	    LOGGER.error(msg);
-	    throw new InvalidRequest(msg);
+		final Like like = Like.builder().likerId(likedBy).likedDate(null).build();
+		final Tweet tweet = tweetRepository.findById(postId).get();
+		final LinkedHashSet<Like> likes = tweet.getLikes();
+
+		if (likes.contains(like)) {
+			likes.remove(like);
+			tweetRepository.save(tweet);
+		} else {
+			// Nothing TODO
+		}
+
+		return DeleteLikeResponse.builder().likes(likes).build();
 	}
 
-	String repliedBy = replyTweetRequest.getRepliedBy();
+	@Override
+	public ReplyTweetResponse replyOnTweet(ReplyTweetRequest replyTweetRequest) {
+		Objects.requireNonNull(replyTweetRequest);
+		LOGGER.info("Inside 'replyOnTweet'... Post Id {} Replied By {}", replyTweetRequest.getPostId(),
+				replyTweetRequest.getRepliedBy());
 
-	if (!userExists(repliedBy)) {
-	    String msg = "No user with email : " + repliedBy + " exist";
-	    LOGGER.error(msg);
-	    throw new InvalidRequest(msg);
+		String postId = replyTweetRequest.getPostId();
+		if (!tweetExists(postId)) {
+			String msg = "Post Id : " + postId + " doesn't exists";
+			LOGGER.error(msg);
+			throw new InvalidRequest(msg);
+		}
+
+		String repliedBy = replyTweetRequest.getRepliedBy();
+
+		if (!userExists(repliedBy)) {
+			String msg = "No user with email : " + repliedBy + " exist";
+			LOGGER.error(msg);
+			throw new InvalidRequest(msg);
+		}
+
+		Tweet tweet = tweetRepository.findById(postId).get();
+
+		tweet.getReplies().add(Reply.builder().repliedBy(repliedBy).content(replyTweetRequest.getReply())
+				.repliedDate(replyTweetRequest.getRepliedDate()).build());
+
+		Tweet save = tweetRepository.save(tweet);
+		LinkedList<Reply> replies = save.getReplies();
+		LOGGER.info("reply saved successfully");
+
+		return ReplyTweetResponse.builder()._status_code(1)._message("reply saved successfully").replies(replies)
+				.build();
 	}
 
-	Tweet tweet = tweetRepository.findById(postId).get();
-
-	tweet.getReplies().add(Reply.builder().repliedBy(repliedBy).content(replyTweetRequest.getReply())
-		.repliedDate(replyTweetRequest.getRepliedDate()).build());
-
-	Tweet save = tweetRepository.save(tweet);
-	LinkedList<Reply> replies = save.getReplies();
-	LOGGER.info("reply saved successfully");
-
-	return ReplyTweetResponse.builder()._status_code(1)._message("reply saved successfully").replies(replies)
-		.build();
-    }
-
-    private boolean userExists(String repliedBy) {
-	return userService.userExists(repliedBy);
-    }
-
-    private boolean tweetExists(String postId) {
-	return tweetRepository.existsById(postId);
-    }
-
-    @Override
-    public DeleteReplyResponse deleteReplyOnTweet(DeleteReplyRequest deleteReplyRequest) {
-	return null;
-    }
-
-    @Override
-    public Page<Tweet> viewTweets(TweetViewConfig tweetViewConfig) {
-	LOGGER.info("Inside 'viewTweets'... ");
-	final TweetFetchType fetchType = tweetViewConfig.fetchType();
-	final Map<TweetViewConfigConstant, Object> configMap = tweetViewConfig.getConfigMap();
-	final Pageable pageRequest = tweetViewConfig.getPageRequest();
-
-	if (fetchType == TweetFetchType.GLOBAL_FEED) {
-	    LOGGER.info("Fetching 'GLOBAL_FEED'... ");
-	    return tweetFetchService.fetchGlobalFeed(pageRequest);
-	} else if (fetchType == TweetFetchType.RECENT_POSTS) {
-	    final String authorEmail = (String) configMap.get(TweetViewConfigConstant.AUTHOR_NAME);
-	    LOGGER.info("Fetching 'RECENT_POSTS'... For user {}", authorEmail);
-	    return tweetFetchService.fetchRecentPostsByAuthor(authorEmail, pageRequest);
-	} else if (fetchType == TweetFetchType.MOST_LIKE) {
-	    final String authorEmail = (String) configMap.get(TweetViewConfigConstant.AUTHOR_NAME);
-	    LOGGER.info("Fetching 'MOST_LIKE'... For user {}", authorEmail);
-	    return tweetFetchService.fetchMostLikedPostsByAuthor(authorEmail, pageRequest);
-	} else {
-	    return null;
-	}
-    }
-
-    @Override
-    public Tweet getOne(String tweet_id) {
-	LOGGER.info("Inside 'getOne' for Post Id{}", tweet_id);
-	Optional<Tweet> optional = tweetRepository.findById(tweet_id);
-	if (optional.isEmpty()) {
-	    LOGGER.error("Post Id: {} doesn't exists", tweet_id);
-	    throw new InvalidRequest("Tweet ID doesn't exist : " + tweet_id);
+	private boolean userExists(String repliedBy) {
+		return userService.userExists(repliedBy);
 	}
 
-	LOGGER.info("Post Id: {} exists!!", tweet_id);
-	return optional.get();
-    }
+	private boolean tweetExists(String postId) {
+		return tweetRepository.existsById(postId);
+	}
+
+	@Override
+	public DeleteReplyResponse deleteReplyOnTweet(DeleteReplyRequest deleteReplyRequest) {
+		return null;
+	}
+
+	@Override
+	public Page<Tweet> viewTweets(TweetViewConfig tweetViewConfig) {
+		LOGGER.info("Inside 'viewTweets'... ");
+		final TweetFetchType fetchType = tweetViewConfig.fetchType();
+		final Map<TweetViewConfigConstant, Object> configMap = tweetViewConfig.getConfigMap();
+		final Pageable pageRequest = tweetViewConfig.getPageRequest();
+
+		if (fetchType == TweetFetchType.GLOBAL_FEED) {
+			LOGGER.info("Fetching 'GLOBAL_FEED'... ");
+			return tweetFetchService.fetchGlobalFeed(pageRequest);
+		} else if (fetchType == TweetFetchType.RECENT_POSTS) {
+			final String authorEmail = (String) configMap.get(TweetViewConfigConstant.AUTHOR_NAME);
+			LOGGER.info("Fetching 'RECENT_POSTS'... For user {}", authorEmail);
+			return tweetFetchService.fetchRecentPostsByAuthor(authorEmail, pageRequest);
+		} else if (fetchType == TweetFetchType.MOST_LIKE) {
+			final String authorEmail = (String) configMap.get(TweetViewConfigConstant.AUTHOR_NAME);
+			LOGGER.info("Fetching 'MOST_LIKE'... For user {}", authorEmail);
+			return tweetFetchService.fetchMostLikedPostsByAuthor(authorEmail, pageRequest);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Tweet getOne(String tweet_id) {
+		LOGGER.info("Inside 'getOne' for Post Id{}", tweet_id);
+		Optional<Tweet> optional = tweetRepository.findById(tweet_id);
+		if (optional.isEmpty()) {
+			LOGGER.error("Post Id: {} doesn't exists", tweet_id);
+			throw new InvalidRequest("Tweet ID doesn't exist : " + tweet_id);
+		}
+
+		LOGGER.info("Post Id: {} exists!!", tweet_id);
+		return optional.get();
+	}
 
 }

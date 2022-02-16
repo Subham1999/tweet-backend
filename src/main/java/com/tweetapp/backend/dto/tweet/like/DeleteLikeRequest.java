@@ -7,10 +7,10 @@ import lombok.Data;
 
 @Data
 public class DeleteLikeRequest {
-    @NotBlank
-    private String postId;
+	@NotBlank
+	private String postId;
 
-    @NotBlank
-    @Email
-    private String likedBy;
+	@NotBlank
+	@Email
+	private String likedBy;
 }

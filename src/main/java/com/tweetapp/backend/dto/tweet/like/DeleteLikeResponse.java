@@ -10,5 +10,5 @@ import lombok.Data;
 @Builder
 @Data
 public class DeleteLikeResponse {
-    private Set<Like> likes;
+	private Set<Like> likes;
 }

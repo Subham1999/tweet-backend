@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UpdateTweetRequest {
-    private String id;
-    private String new_content;
+	private String id;
+	private String new_content;
 }

@@ -15,6 +15,6 @@ import lombok.experimental.SuperBuilder;
 @Data
 public class ViewTweetResponse extends Response {
 
-    private Tweet tweet;
-    private Page<Tweet> tweets;
+	private Tweet tweet;
+	private Page<Tweet> tweets;
 }

@@ -1,7 +1,7 @@
 forgot_password_question: Write your date of birth followed by any 3 digits. (E.g. yyyyMMddxxx 20050203523)
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8090}
   servlet:
     context-path: /api/v1.0
     
@@ -39,4 +39,16 @@ jwt.lifetime: 3600000 # 60 minute
 admin:
   email: ${ADMIN_NAME:subham.santra@cognizant.com}
   password: ${ADMIN_PASSWORD:changeit}
-
+  
+management:
+  endpoint:    prometheus:      enabled: true
+      
+  endpoints:
+    web:
+      exposure:
+        include:
+          - '*'
+        exclude:
+          - beans
+          - env
+          - shutdown

@@ -26,78 +26,78 @@ import com.tweetapp.backend.dto.auth.AuthResponse;
 @AutoConfigureMockMvc
 class RestUserControllerTest {
 
-    private static final String TESTER_PASSWORD = "changeit";
-    private static final String TESTER_MAIL = "subham.santra@cognizant.com";
+	private static final String TESTER_PASSWORD = "changeit";
+	private static final String TESTER_MAIL = "subham.santra@cognizant.com";
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    private String authToken;
+	private String authToken;
 
-    private ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() throws Exception {
-	objectMapper = new ObjectMapper();
-	AuthRequest authRequest = AuthRequest.builder().email(TESTER_MAIL).password(TESTER_PASSWORD).build();
-	String authRequestBody = objectMapper.writeValueAsString(authRequest);
+	@BeforeEach
+	void setUp() throws Exception {
+		objectMapper = new ObjectMapper();
+		AuthRequest authRequest = AuthRequest.builder().email(TESTER_MAIL).password(TESTER_PASSWORD).build();
+		String authRequestBody = objectMapper.writeValueAsString(authRequest);
 
-	MockHttpServletResponse mockHttpServletResponse = mockMvc
-		.perform(post("/auth/generate_token").contentType("application/json").content(authRequestBody))
-		.andReturn().getResponse();
+		MockHttpServletResponse mockHttpServletResponse = mockMvc
+				.perform(post("/auth/generate_token").contentType("application/json").content(authRequestBody))
+				.andReturn().getResponse();
 
-	if (mockHttpServletResponse.getStatus() == 200) {
-	    String contentAsString = mockHttpServletResponse.getContentAsString();
-	    AuthResponse authResponse = objectMapper.readValue(contentAsString.getBytes(), AuthResponse.class);
-	    authToken = authResponse.getJwtToken();
-	} else {
-	    authToken = "<no_token>";
+		if (mockHttpServletResponse.getStatus() == 200) {
+			String contentAsString = mockHttpServletResponse.getContentAsString();
+			AuthResponse authResponse = objectMapper.readValue(contentAsString.getBytes(), AuthResponse.class);
+			authToken = authResponse.getJwtToken();
+		} else {
+			authToken = "<no_token>";
+		}
 	}
-    }
 
-    @AfterEach
-    void tearDown() throws Exception {
-	authToken = null;
-	objectMapper = null;
-    }
+	@AfterEach
+	void tearDown() throws Exception {
+		authToken = null;
+		objectMapper = null;
+	}
 
-    HttpHeaders headers() {
-	final HttpHeaders httpHeaders = new HttpHeaders();
-	httpHeaders.add("Authorization", "Bearer " + authToken);
-	return httpHeaders;
-    }
+	HttpHeaders headers() {
+		final HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Authorization", "Bearer " + authToken);
+		return httpHeaders;
+	}
 
-    @Test
-    void testHealthCheck() throws Exception {
+	@Test
+	void testHealthCheck() throws Exception {
 
-	mockMvc.perform(get("/users/health").headers(headers())).andExpect(status().isOk())
-		.andExpect(jsonPath("serverStatus").value("SERVER IS UP AND RUNNING"));
-    }
+		mockMvc.perform(get("/users/health").headers(headers())).andExpect(status().isOk())
+				.andExpect(jsonPath("serverStatus").value("SERVER IS UP AND RUNNING"));
+	}
 
-    @Test
-    void testViewUser() throws Exception {
+	@Test
+	void testViewUser() throws Exception {
 
-	mockMvc.perform(get("/users/{email}", TESTER_MAIL).headers(headers()).contentType("application/json"))
-		.andExpect(status().isOk()).andExpect(jsonPath("firstName").value("Subham"))
-		.andExpect(jsonPath("lastName").value("Santra")).andExpect(jsonPath("email").value(TESTER_MAIL));
-    }
+		mockMvc.perform(get("/users/{email}", TESTER_MAIL).headers(headers()).contentType("application/json"))
+				.andExpect(status().isOk()).andExpect(jsonPath("firstName").value("Subham"))
+				.andExpect(jsonPath("lastName").value("Santra")).andExpect(jsonPath("email").value(TESTER_MAIL));
+	}
 
-    @Test
-    void testViewUser_whenEmailIsNotPresent() throws Exception {
+	@Test
+	void testViewUser_whenEmailIsNotPresent() throws Exception {
 
-	mockMvc.perform(get("/users/{email}", "no_such_mail@gmail.com").headers(headers())).andExpect(status().is(452));
-    }
+		mockMvc.perform(get("/users/{email}", "no_such_mail@gmail.com").headers(headers())).andExpect(status().is(452));
+	}
 
-    @Test
-    void testSearchUsers() throws Exception {
-	mockMvc.perform(get("/users/search").param("key", "subham").headers(headers()).contentType("application/json"))
-		.andExpect(status().isOk());
-    }
+	@Test
+	void testSearchUsers() throws Exception {
+		mockMvc.perform(get("/users/search").param("key", "subham").headers(headers()).contentType("application/json"))
+				.andExpect(status().isOk());
+	}
 
-    @Test
-    void testCreateUser() throws Exception {
-	mockMvc.perform(get("/users/{email}", "no_such_mail@gmail.com").headers(headers())).andExpect(status().is(452));
-    }
+	@Test
+	void testCreateUser() throws Exception {
+		mockMvc.perform(get("/users/{email}", "no_such_mail@gmail.com").headers(headers())).andExpect(status().is(452));
+	}
 
 //    @Test
 //    void testUpdateUser() throws Exception {

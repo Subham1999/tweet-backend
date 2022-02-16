@@ -8,5 +8,5 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class ViewUserRequest {
-    private String mail;
+	private String mail;
 }
