@@ -84,20 +84,32 @@
 		<appender-ref ref="FileAppender" />
 	</appender>
 
-
+	<!-- WRAPPING ALL APPENDERS INSIDE ASYNC-APPENDER -->
+	<!-- THIS MAKES LOGGING FASTER -->
+	<appender name="ROLLING_FILE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FileAppender"/>
+	</appender>
+	<appender name="KAFKA_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="KafkaAppender"/>
+	</appender>
+	<appender name="CONSOLE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="ConsoleAppender"/>
+	</appender>
+	<!-- END -->
+	
 	<!-- Add all appenders -->
 	<root level="${log.level}">
-		<appender-ref ref="FileAppender" />
+		<appender-ref ref="ROLLING_FILE_ASYNC" />
 		<if condition='isDefined("log.kafka.enable")'>
 			<then>
 				<if condition='property("log.kafka.enable").equals("true")'>
 					<then>
-						<appender-ref ref="KafkaAppender" />
+						<appender-ref ref="KAFKA_ASYNC" />
 					</then>
 				</if>
 			</then>
 		</if>
-		<appender-ref ref="ConsoleAppender" />
+		<appender-ref ref="CONSOLE_ASYNC" />
 	</root>
 
 </configuration>
