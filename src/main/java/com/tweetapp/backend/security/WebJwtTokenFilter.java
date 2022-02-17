@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WebJwtTokenFilter extends OncePerRequestFilter {
 
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebJwtTokenFilter.class);
 
 	@Autowired
@@ -44,7 +45,8 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private MyUserDetailService userDetailService;
 
-	private static final String MDC_TOKEN = "req_id";
+	private static final String REQUESTID = "REQUESTID";
+	private static final String MDC_TOKEN = "SESSIONID";
 	private static final String RESPONSE_HEADER = "x-tweet-app-res-ID";
 	private static final String REQUEST_HEADER = "x-tweet-app-req-ID";
 
@@ -62,12 +64,14 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 			if (!StringUtils.isEmpty(REQUEST_HEADER) && !StringUtils.isEmpty(request.getHeader(REQUEST_HEADER))) {
 				token = request.getHeader(REQUEST_HEADER);
 			} else {
-				token = UUID.randomUUID().toString();
+				token = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			}
 
 //			System.out.println(token);
 
 			MDC.put(MDC_TOKEN, token);
+			MDC.put(REQUESTID, UUID.randomUUID().toString().toLowerCase().replaceAll("-", ""));
+			
 			if (!StringUtils.isEmpty(RESPONSE_HEADER)) {
 				response.addHeader(RESPONSE_HEADER, token);
 			}
@@ -114,6 +118,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 			LOGGER.error("Exception at 'WebJwtTokenFilter' : {}", ExceptionUtils.getStackTrace(e));
 		} finally {
 			MDC.remove(MDC_TOKEN);
+			MDC.remove(REQUESTID);
 		}
 	}
 
