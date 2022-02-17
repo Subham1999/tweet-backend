@@ -52,6 +52,9 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private Provider<HttpRequestDataHolder> provider;
+	
+	@Autowired
+	private UniqueRequestIDGenerator requestIDGenerator;
 
 	@Override
 	protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
@@ -70,7 +73,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 //			System.out.println(token);
 
 			MDC.put(MDC_TOKEN, token);
-			MDC.put(REQUESTID, UUID.randomUUID().toString().toLowerCase().replaceAll("-", ""));
+			MDC.put(REQUESTID, requestIDGenerator.get());
 			
 			if (!StringUtils.isEmpty(RESPONSE_HEADER)) {
 				response.addHeader(RESPONSE_HEADER, token);
