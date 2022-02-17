@@ -22,17 +22,66 @@
 
 	<appender name="FileAppender"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		
+
 		<!-- ACTIVE OUTPUT TARGET -->
 		<file>${baseDir}/${app.name}-${app.version}.log</file>
-		
+
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- ARCHIVED LOG FILES -->
 			<fileNamePattern>
 				${baseDir}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.log
 			</fileNamePattern>
-			
+
+			<maxFileSize>200KB</maxFileSize>
+			<maxHistory>1</maxHistory>
+			<totalSizeCap>1MB</totalSizeCap>
+		</rollingPolicy>
+
+		<append>true</append>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<customFields>${log.custom.field.app.name}</customFields>
+			<fieldNames>
+				<timestamp>timestamp</timestamp>
+				<version>[ignore]</version>
+				<levelValue>[ignore]</levelValue>
+				<logger>logger</logger>
+				<thread>thread</thread>
+			</fieldNames>
+		</encoder>
+	</appender>
+
+	<appender name="FILE_APPENDER_ERROR"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<OnMatch>ACCEPT</OnMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>WARN</level>
+			<OnMatch>ACCEPT</OnMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<OnMatch>DENY</OnMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>DEBUG</level>
+			<OnMatch>DENY</OnMatch>
+		</filter>
+
+
+		<!-- ACTIVE OUTPUT TARGET -->
+		<file>${baseDir}/${app.name}-${app.version}.ERROR.log</file>
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- ARCHIVED LOG FILES -->
+			<fileNamePattern>
+				${baseDir}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.ERROR.log
+			</fileNamePattern>
+
 			<maxFileSize>200KB</maxFileSize>
 			<maxHistory>1</maxHistory>
 			<totalSizeCap>1MB</totalSizeCap>
@@ -86,17 +135,24 @@
 
 	<!-- WRAPPING ALL APPENDERS INSIDE ASYNC-APPENDER -->
 	<!-- THIS MAKES LOGGING FASTER -->
-	<appender name="ROLLING_FILE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="FileAppender"/>
+	<appender name="ROLLING_FILE_ASYNC"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FileAppender" />
 	</appender>
-	<appender name="KAFKA_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="KafkaAppender"/>
+	<appender name="KAFKA_ASYNC"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="KafkaAppender" />
 	</appender>
-	<appender name="CONSOLE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="ConsoleAppender"/>
+	<appender name="CONSOLE_ASYNC"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="ConsoleAppender" />
+	</appender>
+	<appender level="ERROR" name="FILE_APPENDER_ERROR_ASYNC"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE_APPENDER_ERROR" />
 	</appender>
 	<!-- END -->
-	
+
 	<!-- Add all appenders -->
 	<root level="${log.level}">
 		<appender-ref ref="ROLLING_FILE_ASYNC" />
@@ -110,6 +166,7 @@
 			</then>
 		</if>
 		<appender-ref ref="CONSOLE_ASYNC" />
+		<appender-ref ref="FILE_APPENDER_ERROR_ASYNC" />
 	</root>
 
 </configuration>
