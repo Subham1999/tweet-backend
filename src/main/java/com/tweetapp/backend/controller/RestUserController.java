@@ -62,13 +62,11 @@ public class RestUserController {
 
 	@RequestMapping(path = Urls.HEALTH_CHECK, method = RequestMethod.GET)
 	public HealthCheckResponse healthCheck() {
-		LOGGER.info("Inside 'healthCheck'");
 		return HealthCheckResponse.builder().serverStatus(SERVER_CONDITION_GOOD).build();
 	}
 
 	@RequestMapping(path = "/{email}", method = RequestMethod.GET)
 	public ViewUserResponse viewUser(@PathVariable @Email String email) {
-		LOGGER.info("Inside 'viewUser'");
 		return userService.viewUser(ViewUserRequest.builder().mail(email).build());
 	}
 
@@ -80,7 +78,6 @@ public class RestUserController {
 
 	@RequestMapping(path = "/register", method = RequestMethod.POST)
 	public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
-		LOGGER.info("Inside 'createUser'");
 		CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
 		if (createUserResponse.get_status_code() == 0) {
 			LOGGER.error("Registration failed!!");
@@ -95,7 +92,6 @@ public class RestUserController {
 	public ResponseEntity<Object> updateUser(@PathVariable(required = true) String email,
 			@RequestBody UpdateUserRequest updateUserRequest) {
 
-		LOGGER.info("Inside 'updateUser'");
 
 		if (!isValidEmail(email)) {
 			LOGGER.info("Email is not valid {}", email);
@@ -122,7 +118,6 @@ public class RestUserController {
 	@PostMapping("/secret_share")
 	public ResponseEntity<?> storeSecrets(@RequestBody @Valid ForgotPasswordAnswer forgotPasswordAnswer) {
 
-		LOGGER.info("Inside 'storeSecrets'");
 		String userEmail = forgotPasswordAnswer.getUserEmail();
 
 		if (userService.userExists(userEmail)) {
@@ -148,7 +143,6 @@ public class RestUserController {
 	public Users getAllUsers(
 			@RequestParam(name = "pageLength", required = false, defaultValue = "30") String pageLength,
 			@RequestParam(name = "pageOffset", required = false, defaultValue = "0") String pageOffset) {
-		LOGGER.info("Inside 'getAllUsers'");
 		int page = Integer.parseInt(pageOffset);
 		int size = Integer.parseInt(pageLength);
 		return userService.getAllUsers(PageRequest.of(page, size));

@@ -59,7 +59,6 @@ public class AuthController {
 	public AuthResponse generateToken(
 			@ApiParam(value = "Authentication Request META DATA", required = true) @RequestBody AuthRequest authReq) {
 
-		LOGGER.info("Inside 'generateToken'");
 		String password = authReq.getPassword();
 		String email = authReq.getEmail();
 
@@ -93,7 +92,6 @@ public class AuthController {
 			+ "forgot his/her password but need to provide formatted secret along with new password, password will be updated and user will get jwt token", response = ForgotPasswordResponse.class, produces = "application/json", consumes = "application/json")
 	public ForgotPasswordResponse forgotPassword(
 			@ApiParam(value = "Forgot password request") @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
-		LOGGER.info("Inside 'forgotPassword'");
 
 		String email = forgotPasswordRequest.getEmail();
 		String secret = forgotPasswordRequest.getSecret();

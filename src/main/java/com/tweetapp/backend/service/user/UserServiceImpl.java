@@ -228,7 +228,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Users getAllUsers(PageRequest pageRequest) {
-		LOGGER.info("Inside 'getAllUsers'...");
 		try {
 			final Page<User> page = userRepository.findAll(pageRequest);
 			final List<ViewUserResponse> user = page.getContent().stream().map(this::mapToView)

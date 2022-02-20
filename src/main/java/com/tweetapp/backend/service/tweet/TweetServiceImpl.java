@@ -227,7 +227,8 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public Page<Tweet> viewTweets(TweetViewConfig tweetViewConfig) {
-		LOGGER.info("Inside 'viewTweets'... ");
+	    String userEmail = (String) tweetViewConfig.getConfigMap().get(TweetViewConfigConstant.AUTHOR_NAME);
+	    if (userService.userExists(userEmail)) {
 		final TweetFetchType fetchType = tweetViewConfig.fetchType();
 		final Map<TweetViewConfigConstant, Object> configMap = tweetViewConfig.getConfigMap();
 		final Pageable pageRequest = tweetViewConfig.getPageRequest();
@@ -246,6 +247,9 @@ public class TweetServiceImpl implements TweetService {
 		} else {
 			return null;
 		}
+	    } else {
+		throw new InvalidRequest("userEmail doesnot exist : " + userEmail);
+	    }
 	}
 
 	@Override

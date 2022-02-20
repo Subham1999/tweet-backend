@@ -1,7 +1,7 @@
 forgot_password_question: Write your date of birth followed by any 3 digits. (E.g. yyyyMMddxxx 20050203523)
 
 server:
-  port: ${SERVER_PORT:8090}
+  port: ${SERVER_PORT:8080}
   servlet:
     context-path: /api/v1.0
     

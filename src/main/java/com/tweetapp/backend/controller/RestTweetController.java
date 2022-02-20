@@ -63,7 +63,6 @@ public class RestTweetController {
 
 	@PostMapping
 	public CreateTweetResponse postNewTweet(@RequestBody CreateTweetRequest createTweetRequest) {
-		LOGGER.info("Inside 'postNewTweet'");
 		return tweetService.createTweet(createTweetRequest);
 	}
 
@@ -124,7 +123,6 @@ public class RestTweetController {
 
 	@GetMapping("/{tweet_id}")
 	public Tweet getOne(@PathVariable String tweet_id) {
-		LOGGER.info("Inside 'getOne'");
 		return tweetService.getOne(tweet_id);
 	}
 
@@ -138,20 +136,17 @@ public class RestTweetController {
 
 	@PostMapping("/reply")
 	public ResponseEntity<Object> replyOnPost(@RequestBody @Valid ReplyTweetRequest replyTweetRequest) {
-		LOGGER.info("Inside 'replyOnPost'");
 		ReplyTweetResponse replyTweetResponse = tweetService.replyOnTweet(replyTweetRequest);
 		return ResponseEntity.ok(replyTweetResponse);
 	}
 
 	@PostMapping("/like")
 	public LikeTweetResponse likeOnPost(@RequestBody @Valid LikeTweetRequest likeTweetRequest) {
-		LOGGER.info("Inside 'likeOnPost'");
 		return tweetService.likeOnTweet(likeTweetRequest);
 	}
 
 	@PostMapping("/dislike")
 	public DeleteLikeResponse dislikeOnPost(@RequestBody @Valid DeleteLikeRequest deleteLikeRequest) {
-		LOGGER.info("Inside 'dislikeOnPost'");
 		return tweetService.deleteLikeOnTweet(deleteLikeRequest);
 	}
 
