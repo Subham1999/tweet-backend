@@ -17,4 +17,5 @@
  - User should be able to add new tweet.
  - User should be able to add comment on any tweet posted by anybody.
  - User should be able to like or dislike any tweet.
- 
+#
+![tweet-app-diagram.drawio.png](assets/tweet-app-diagram.drawio.png "tweet-app-diagram.drawio.png")
