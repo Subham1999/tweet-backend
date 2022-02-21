@@ -96,7 +96,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 			LOGGER.info("{request : {}, 'Authorization' : {}, user-email : {}, client: {}",
 					(request.getMethod() + " " + request.getRequestURI()),
 					(isHeaderPresent(authHeader) ? "'present'" : "'NOT present'"), userName,
-					request.getHeader("sec-ch-ua-platform"));
+					request.getHeader("User-Agent"));
 			if (Objects.nonNull(userName) && Objects.isNull(authentication)) {
 				final UserDetails loadUserByUsername = userDetailService.loadUserByUsername(userName);
 				if (jwtTokenUtil.validateToken(jwtToken, loadUserByUsername)) {
