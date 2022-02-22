@@ -93,7 +93,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 				}
 			}
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			LOGGER.info("{request : {}, 'Authorization' : {}, user-email : {}, client: {}",
+			LOGGER.info("****** request={} authorization={} user-email={} client={}",
 					(request.getMethod() + " " + request.getRequestURI()),
 					(isHeaderPresent(authHeader) ? "'present'" : "'NOT present'"), userName,
 					request.getHeader("User-Agent"));
