@@ -100,7 +100,7 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 			if (Objects.nonNull(userName) && Objects.isNull(authentication)) {
 				final UserDetails loadUserByUsername = userDetailService.loadUserByUsername(userName);
 				if (jwtTokenUtil.validateToken(jwtToken, loadUserByUsername)) {
-					LOGGER.info("#################### USER Validated-----------------------");
+					LOGGER.info("!!!!!! User authenticated");
 					final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 							jwtToken, null, loadUserByUsername.getAuthorities());
 					usernamePasswordAuthenticationToken
@@ -108,12 +108,12 @@ public class WebJwtTokenFilter extends OncePerRequestFilter {
 					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 					provider.get().setUser(userName);
 				} else {
-					LOGGER.info("#################### USER NOT Validated-----------------------");
+					LOGGER.error("!!!!!! User can not be authenticated **'jwt token is invalid'");
 				}
 			} else {
 				final String issue = isHeaderPresent(authHeader) ? "JWT Expired Or JWT Parse error"
 						: "Internal Server error";
-				LOGGER.error("#################### USER NOT Validated because {}", issue);
+				LOGGER.error("!!!!!! USER NOT Validated because {}", issue);
 			}
 			response.setHeader("Access-Control-Expose-Headers", RESPONSE_HEADER);
 			filterChain.doFilter(request, response);
