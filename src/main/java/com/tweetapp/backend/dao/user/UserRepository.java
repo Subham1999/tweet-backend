@@ -10,8 +10,8 @@ import com.tweetapp.backend.models.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
 
-	Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-	@Query(value = "{ $or: [ { 'firstName' : /?0/ }, { 'lastName' : /?0/ }, { 'email' : /?0/ } ] }")
-	List<User> findUserByKey(String key);
+    @Query(value = "{ $or: [ { 'firstName' : /?0/ }, { 'lastName' : /?0/ }, { 'email' : /?0/ } ] }")
+    List<User> findUserByKey(String key);
 }

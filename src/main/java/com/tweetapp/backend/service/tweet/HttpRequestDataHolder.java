@@ -9,5 +9,5 @@ import lombok.Data;
 @Scope("request")
 @Data
 public class HttpRequestDataHolder {
-	private String user;
+    private String user;
 }

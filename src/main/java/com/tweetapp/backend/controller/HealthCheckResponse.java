@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class HealthCheckResponse {
-	private String serverStatus;
+    private String serverStatus;
 }

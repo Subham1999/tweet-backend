@@ -6,9 +6,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface TweetViewConfig {
 
-	TweetFetchType fetchType();
+    TweetFetchType fetchType();
 
-	Map<TweetViewConfigConstant, Object> getConfigMap();
+    Map<TweetViewConfigConstant, Object> getConfigMap();
 
-	Pageable getPageRequest();
+    Pageable getPageRequest();
 }

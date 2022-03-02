@@ -10,6 +10,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response {
-	private int _status_code;
-	private String _message;
+    private int _status_code;
+    private String _message;
 }

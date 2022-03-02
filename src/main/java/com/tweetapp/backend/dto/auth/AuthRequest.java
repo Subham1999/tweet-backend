@@ -10,9 +10,9 @@ import lombok.Data;
 @Builder
 public class AuthRequest {
 
-	@Email
-	@NotBlank
-	private String email;
-	@NotBlank
-	private String password;
+    @Email
+    @NotBlank
+    private String email;
+    @NotBlank
+    private String password;
 }

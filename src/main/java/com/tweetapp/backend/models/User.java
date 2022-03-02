@@ -16,11 +16,11 @@ import lombok.ToString;
 @ToString
 @Document(collection = "USER_DETAILS")
 public class User {
-	private String firstName;
-	private String lastName;
-	@Id
-	private String email;
-	private String password;
-	private Date dateOfJoin;
-	private boolean isSecretShared;
+    private String firstName;
+    private String lastName;
+    @Id
+    private String email;
+    private String password;
+    private Date dateOfJoin;
+    private boolean isSecretShared;
 }

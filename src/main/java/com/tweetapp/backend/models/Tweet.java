@@ -18,14 +18,14 @@ import lombok.Data;
 @Builder
 @Document(collection = "TWEET_DETAILS")
 public class Tweet {
-	@Id
-	private String id;
-	private String content;
-	private String createdBy;
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date createdAt;
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date updatedAt;
-	private LinkedHashSet<Like> likes;
-	private LinkedList<Reply> replies;
+    @Id
+    private String id;
+    private String content;
+    private String createdBy;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date updatedAt;
+    private LinkedHashSet<Like> likes;
+    private LinkedList<Reply> replies;
 }

@@ -12,8 +12,8 @@ import lombok.Data;
 @Data
 @JsonInclude(Include.NON_NULL)
 public class CreateTweetResponse {
-	private String id;
-	private String content;
-	private String createdBy;
-	private Date createdAt;
+    private String id;
+    private String content;
+    private String createdBy;
+    private Date createdAt;
 }

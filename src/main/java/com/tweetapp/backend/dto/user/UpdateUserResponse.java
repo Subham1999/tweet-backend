@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class UpdateUserResponse extends Response {
-	private String firstName;
-	private String lastName;
-	private String email;
+    private String firstName;
+    private String lastName;
+    private String email;
 }

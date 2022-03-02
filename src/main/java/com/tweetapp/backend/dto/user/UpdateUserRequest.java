@@ -10,9 +10,9 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class UpdateUserRequest {
-	private String firstName;
-	private String lastName;
-	@Email
-	private String email;
-	private boolean isSecretShared;
+    private String firstName;
+    private String lastName;
+    @Email
+    private String email;
+    private boolean isSecretShared;
 }

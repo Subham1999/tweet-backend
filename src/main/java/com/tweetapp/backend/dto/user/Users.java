@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 @Builder
 public class Users {
-	boolean isFirst;
-	boolean isLast;
-	boolean isEmpty;
-	List<ViewUserResponse> user;
+    boolean isFirst;
+    boolean isLast;
+    boolean isEmpty;
+    List<ViewUserResponse> user;
 }

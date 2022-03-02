@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Document(collection = "USER_SECRETS")
 public class ForgotPasswordAnswer {
 
-	@Id
-	@Email
-	private String userEmail;
+    @Id
+    @Email
+    private String userEmail;
 
-	@Pattern(regexp = "[0-9]{8}", message = "Invalid secret key")
-	private String answer;
+    @Pattern(regexp = "[0-9]{8}", message = "Invalid secret key")
+    private String answer;
 }

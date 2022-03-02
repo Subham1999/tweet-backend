@@ -15,12 +15,12 @@ import lombok.Data;
 @Builder
 @JsonInclude(Include.NON_NULL)
 public class CreateUserResponse {
-	private int _status_code;
-	private String _message;
+    private int _status_code;
+    private String _message;
 
-	private String firstName;
-	private String lastName;
-	private String email;
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date dateOfJoin;
+    private String firstName;
+    private String lastName;
+    private String email;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date dateOfJoin;
 }

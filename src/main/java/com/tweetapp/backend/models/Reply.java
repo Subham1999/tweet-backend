@@ -10,7 +10,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class Reply {
-	private String content;
-	private Date repliedDate;
-	private String repliedBy;
+    private String content;
+    private Date repliedDate;
+    private String repliedBy;
 }

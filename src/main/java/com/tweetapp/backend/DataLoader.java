@@ -14,23 +14,23 @@ import com.tweetapp.backend.service.user.UserService;
 @Component
 public class DataLoader implements ApplicationRunner {
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Value("${admin.email}")
-	private String adminEmail;
+    @Value("${admin.email}")
+    private String adminEmail;
 
-	@Value("${admin.password}")
-	private String adminPassword;
+    @Value("${admin.password}")
+    private String adminPassword;
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		userService.createUser(createAdminData());
-	}
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+	userService.createUser(createAdminData());
+    }
 
-	private CreateUserRequest createAdminData() {
-		return CreateUserRequest.builder().firstName("Subham").lastName("Santra").dateOfJoin(new Date())
-				.email(adminEmail).password(adminPassword).build();
-	}
+    private CreateUserRequest createAdminData() {
+	return CreateUserRequest.builder().firstName("Subham").lastName("Santra").dateOfJoin(new Date())
+		.email(adminEmail).password(adminPassword).build();
+    }
 
 }

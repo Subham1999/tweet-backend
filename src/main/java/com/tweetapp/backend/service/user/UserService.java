@@ -14,17 +14,17 @@ import com.tweetapp.backend.dto.user.auth.LoginResponse;
 
 public interface UserService {
 
-	ViewUserResponse viewUser(ViewUserRequest viewUserRequest);
+    ViewUserResponse viewUser(ViewUserRequest viewUserRequest);
 
-	CreateUserResponse createUser(CreateUserRequest createUserRequest);
+    CreateUserResponse createUser(CreateUserRequest createUserRequest);
 
-	UpdateUserResponse updateUser(UpdateUserRequest updateUserRequest);
+    UpdateUserResponse updateUser(UpdateUserRequest updateUserRequest);
 
-	LoginResponse attemptLogin(LoginRequest loginRequest);
+    LoginResponse attemptLogin(LoginRequest loginRequest);
 
-	boolean userExists(String email);
+    boolean userExists(String email);
 
-	Users getAllUsers(PageRequest pageRequest);
+    Users getAllUsers(PageRequest pageRequest);
 
-	Users searchUser(String key);
+    Users searchUser(String key);
 }

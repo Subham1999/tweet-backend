@@ -9,5 +9,5 @@ import lombok.Data;
 @Builder
 public class UpdateTweetResponse {
 
-	private Tweet tweet;
+    private Tweet tweet;
 }

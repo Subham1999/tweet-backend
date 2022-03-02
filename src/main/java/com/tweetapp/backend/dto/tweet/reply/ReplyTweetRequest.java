@@ -15,17 +15,17 @@ import lombok.Data;
 @Data
 public class ReplyTweetRequest {
 
-	@NotBlank
-	private String postId;
+    @NotBlank
+    private String postId;
 
-	@NotBlank
-	@Length(max = 150, min = 1)
-	private String reply;
+    @NotBlank
+    @Length(max = 150, min = 1)
+    private String reply;
 
-	@Email
-	private String repliedBy;
+    @Email
+    private String repliedBy;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	@NonNull
-	private Date repliedDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NonNull
+    private Date repliedDate;
 }
