@@ -24,7 +24,7 @@
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 
 		<!-- ACTIVE OUTPUT TARGET -->
-		<file>${baseDir}/${app.name}-${app.version}.log</file>
+		<file>${LOG_DIRECTORY}/${app.name}-${app.version}.log</file>
 
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
