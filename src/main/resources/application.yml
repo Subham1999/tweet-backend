@@ -16,9 +16,13 @@ server:
 spring:
   data:
     mongodb:
-#      uri: ${NOSQL_DB_PROTO:mongodb}:${CRED_DETAILS:}//${DB_HOST:localhost}:${DB_PORT:27017}/${DB_NAME:test}?${DB_CONN_PARAMS:}
-#      uri: mongodb://ec2-3-111-37-99.ap-south-1.compute.amazonaws.com:27017/tweet-app-db
-      uri: ${DB_URI}
+      host: ${DB_HOST}
+      port: ${DB_PORT}
+      authentication-database: admin
+      username: ${DB_USR}
+      password: ${DB_PWD}
+      database: ${DB_NAME}
+   
   
 swagger_api_doc:
   group_name: Tweet App public API
