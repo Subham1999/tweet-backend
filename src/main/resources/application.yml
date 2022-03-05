@@ -16,12 +16,14 @@ server:
 spring:
   data:
     mongodb:
-      host: ${DB_HOST}
-      port: ${DB_PORT}
-      authentication-database: admin
-      username: ${DB_USR}
-      password: ${DB_PWD}
-      database: ${DB_NAME}
+#      host: ${DB_HOST}
+#      port: ${DB_PORT}
+#      authentication-database: admin
+#      username: ${DB_USR}
+#      password: ${DB_PWD}
+#      database: ${DB_NAME}
+      uri: mongodb://subham000:<>@subham-tweetap-db-cluster.cluster-cs0jdd1w03hc.ap-south-1.docdb.amazonaws.com:27017/tweetapp-db?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false
+      
    
   
 swagger_api_doc:
