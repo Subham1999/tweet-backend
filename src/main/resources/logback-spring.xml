@@ -30,7 +30,7 @@
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- ARCHIVED LOG FILES -->
 			<fileNamePattern>
-				${baseDir}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.log
+				${LOG_DIRECTORY}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.log
 			</fileNamePattern>
 
 			<maxFileSize>200KB</maxFileSize>
