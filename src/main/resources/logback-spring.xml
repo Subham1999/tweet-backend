@@ -156,15 +156,15 @@
 	<!-- Add all appenders -->
 	<root level="${log.level}">
 		<appender-ref ref="ROLLING_FILE_ASYNC" />
-		<if condition='isDefined("log.kafka.enable")'>
-			<then>
-				<if condition='property("log.kafka.enable").equals("true")'>
-					<then>
+		<!-- <if condition='isDefined("log.kafka.enable")'> -->
+			<!-- <then> -->
+				<!-- <if condition='property("log.kafka.enable").equals("true")'> -->
+					<!-- <then> -->
 						<appender-ref ref="KAFKA_ASYNC" />
-					</then>
-				</if>
-			</then>
-		</if>
+					<!-- </then> -->
+				<!-- </if> -->
+			<!-- </then> -->
+		<!-- </if> -->
 		<appender-ref ref="CONSOLE_ASYNC" />
 		<appender-ref ref="FILE_APPENDER_ERROR_ASYNC" />
 	</root>
