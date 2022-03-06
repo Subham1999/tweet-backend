@@ -73,13 +73,13 @@
 
 
 		<!-- ACTIVE OUTPUT TARGET -->
-		<file>${baseDir}/${app.name}-${app.version}.ERROR.log</file>
+		<file>${LOG_DIRECTORY}/${app.name}-${app.version}.ERROR.log</file>
 
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- ARCHIVED LOG FILES -->
 			<fileNamePattern>
-				${baseDir}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.ERROR.log
+				${LOG_DIRECTORY}/${app.name}-${app.version}_%d{yyyy-MM-dd}_%i.ERROR.log
 			</fileNamePattern>
 
 			<maxFileSize>200KB</maxFileSize>
@@ -122,8 +122,7 @@
 			class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
 
 		<!-- Kafka producer configuration starts -->
-		<producerConfig>bootstrap.servers=${log.kafka.bootstrap.servers}
-		</producerConfig>
+		<producerConfig>bootstrap.servers=${log.kafka.bootstrap.servers}</producerConfig>
 		<producerConfig>linger.ms=1000</producerConfig>
 		<!-- even if the producer buffer runs full, do not block the application 
 			but start to drop messages -->
