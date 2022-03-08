@@ -159,7 +159,7 @@
 			<!-- <then> -->
 				<!-- <if condition='property("log.kafka.enable").equals("true")'> -->
 					<!-- <then> -->
-						<!-- <appender-ref ref="KAFKA_ASYNC" /> -->
+						<appender-ref ref="KAFKA_ASYNC" />
 					<!-- </then> -->
 				<!-- </if> -->
 			<!-- </then> -->
